@@ -1,0 +1,209 @@
+/* ==================================================
+   BASE APP
+================================================== */
+
+.container {
+  max-width: 1000px;
+  margin: auto;
+  font-family: Arial, sans-serif;
+}
+
+.search-box {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.movie-info {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.cast-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.cast-card {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cast-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================================================
+   MODAL OVERLAY
+================================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* ==================================================
+   MODAL CONTAINER (NÃO SCROLLA)
+================================================== */
+
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 90%;
+  max-height: 90vh;
+  overflow: hidden; /* 🔒 impede scroll do modal */
+}
+
+/* ==================================================
+   MODAL GRID
+================================================== */
+
+.modal-wide {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  height: 90vh;            /* 🔑 chave para scroll funcionar */
+  max-width: 1000px;
+}
+
+/* ==================================================
+   LEFT COLUMN — ACTOR
+================================================== */
+
+.actor-details {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e5e5e5;
+  height: 100%;
+}
+
+.actor-scroll {
+  flex: 1;                 /* ocupa espaço disponível */
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.actor-details img {
+  width: 100%;
+  max-width: 240px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.actor-details h2 {
+  margin: 12px 0;
+}
+
+.actor-details p {
+  margin: 6px 0;
+  font-size: 14px;
+}
+
+/* ==================================================
+   FOOTER FIXO
+================================================== */
+
+.modal-footer {
+  padding: 12px;
+  border-top: 1px solid #e5e5e5;
+  display: flex;
+  justify-content: center;
+}
+
+/* ==================================================
+   CLOSE BUTTON
+================================================== */
+
+.close-button {
+  padding: 8px 28px;
+  border: none;
+  border-radius: 4px;
+  background: #222;
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.close-button:hover {
+  background: #444;
+}
+
+.close-button:focus {
+  outline: 2px solid #aaa;
+}
+
+.close-button:active {
+  transform: scale(0.97);
+}
+
+/* ==================================================
+   RIGHT COLUMN — MOVIES
+================================================== */
+
+.actor-movies {
+  height: 100%;            /* 🔑 permite scroll independente */
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.actor-movies h3 {
+  margin-bottom: 12px;
+}
+
+.actor-movies ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.actor-movies li {
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+}
+
+.movie-title {
+  font-weight: 600;
+}
+
+.movie-character {
+  font-size: 12px;
+  color: #666;
+}
+
+/* ==================================================
+   MOBILE RESPONSIVE
+================================================== */
+
+@media (max-width: 768px) {
+  .modal-wide {
+    grid-template-columns: 1fr;
+    height: 90vh;
+  }
+
+  .actor-details {
+    border-right: none;
+    border-bottom: 1px solid #e5e5e5;
+  }
+
+  .actor-movies {
+    height: auto;
+    max-height: 40vh;      /* scroll só na lista */
+  }
+
+  .actor-details img {
+    max-width: 180px;
+    margin: auto;
+  }
+}
