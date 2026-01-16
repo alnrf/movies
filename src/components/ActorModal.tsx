@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import type { Person } from "../types/Person";
 import { TMDB_CONFIG } from "../config/tmdb";
 import type { MovieCredit } from "../types/MovieCredit";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface Props {
   actorId: number;
@@ -9,9 +11,12 @@ interface Props {
   onClose: () => void;
 }
 
+const BIOGRAPHY_MAX_LENGTH = 150;
+
 export default function ActorModal({ actorId, movieYear, onClose }: Props) {
   const [actor, setActor] = useState<Person | null>(null);
   const [movies, setMovies] = useState<MovieCredit[]>([]);
+  const [bioToast, setBioToast] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -43,15 +48,13 @@ export default function ActorModal({ actorId, movieYear, onClose }: Props) {
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
 
-  useEffect(() => {
-    // trava scroll do body
-    document.body.style.overflow = "hidden";
+useEffect(() => {
+  document.body.style.overflow = "hidden";
+  return () => {
+    document.body.style.overflow = "";
+  };
+}, []);
 
-    return () => {
-      // libera scroll ao fechar modal
-      document.body.style.overflow = "";
-    };
-  }, []);
 
   if (!actor) return null;
 
@@ -85,6 +88,18 @@ export default function ActorModal({ actorId, movieYear, onClose }: Props) {
     );
   });
 
+    const truncateText = (text: string, maxLength: number): string => {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + "...";
+  };
+
+  const handleBioClick = () => {
+    if (actor?.biography) {
+      setBioToast(actor.biography);
+      setTimeout(() => setBioToast(null), 5000); // Toast desaparece em 5s
+    }
+  };
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
@@ -103,25 +118,59 @@ export default function ActorModal({ actorId, movieYear, onClose }: Props) {
             <h2>{actor.name}</h2>
 
             <p>
-              <strong>Nascimento:</strong> {actor.birthday || "—"}
+              <strong>Nascimento:</strong>{" "}
+              {actor.birthday
+                ? format(actor.birthday, "dd/MM/yyyy", { locale: ptBR })
+                : "—"}
             </p>
 
             {actor.deathday && (
               <p>
-                <strong>Falecimento:</strong> {actor.deathday}
+                <strong>Falecimento:</strong>{" "}
+                {actor.deathday
+                  ? format(actor.deathday, "dd/MM/yyyy", { locale: ptBR })
+                  : "—"}
               </p>
             )}
 
             <p>
-              <strong>Idade no filme:</strong> {ageInMovie}
+              <strong>Idade no filme:</strong> {ageInMovie} anos
             </p>
 
             <p>
-              <strong>
-                {actor.deathday ? "Idade ao falecer:" : "Idade atual:"}
-              </strong>{" "}
-              {ageNow}
+              <strong>Idade:</strong>
+              {` ${ageNow} anos`}
             </p>
+            <p>
+              <strong>Local de Nascimento:</strong>
+              {` ${actor.place_of_birth || "—"}`}
+            </p>
+             <p>
+              <strong>Bio:</strong>
+              {actor.biography ? (
+                <button
+                  onClick={handleBioClick}
+                  style={{
+                    background: "none",
+                    border: "none",
+                    color: "inherit",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    padding: 0,
+                    marginLeft: "0.5em",
+                  }}
+                >
+                  {truncateText(actor.biography, BIOGRAPHY_MAX_LENGTH)}
+                </button>
+              ) : (
+                " —"
+              )}
+            </p>
+              {bioToast && (
+              <div className="toast">
+                {bioToast}
+              </div>
+            )}
           </div>
 
           <div className="modal-footer">
