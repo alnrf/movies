@@ -1,175 +1,67 @@
 import { useEffect, useState } from "react";
-import type { Person } from "../types/Person";
-import { TMDB_CONFIG } from "../config/tmdb";
-import type { MovieCredit } from "../types/MovieCredit";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import {
+  getActorDetail,
+  getActorMovies,
+} from "../api/tmdbService";
 
-interface Props {
-  actorId: number;
-  movieYear: number;
-  onClose: () => void;
-}
-
-const BIOGRAPHY_MAX_LENGTH = 150;
-
-export default function ActorModal({ actorId, movieYear, onClose }: Props) {
-  const [actor, setActor] = useState<Person | null>(null);
-  const [movies, setMovies] = useState<MovieCredit[]>([]);
-  const [bioToast, setBioToast] = useState<string | null>(null);
+export default function ActorModal({ actorId, onClose }: any) {
+  const [actor, setActor] = useState<any>(null);
+  const [movies, setMovies] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    document.body.style.overflow = "hidden";
+
     async function fetchData() {
-      const [personRes, creditsRes] = await Promise.all([
-        fetch(`${TMDB_CONFIG.BASE_URL}/person/${actorId}?language=pt-BR`, {
-          headers: TMDB_CONFIG.HEADERS,
-        }),
-        fetch(
-          `${TMDB_CONFIG.BASE_URL}/person/${actorId}/movie_credits?language=pt-BR`,
-          { headers: TMDB_CONFIG.HEADERS }
-        ),
-      ]);
+      try {
+        const [detail, credits] = await Promise.all([
+          getActorDetail(actorId),
+          getActorMovies(actorId),
+        ]);
 
-      const personData = await personRes.json();
-      const creditsData = await creditsRes.json();
-
-      setActor(personData);
-      setMovies(creditsData.cast);
+        setActor(detail.data);
+        setMovies(credits.data.cast);
+      } finally {
+        setLoading(false);
+      }
     }
 
     fetchData();
+
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [actorId]);
-
-  useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose]);
-
-useEffect(() => {
-  document.body.style.overflow = "hidden";
-  return () => {
-    document.body.style.overflow = "";
-  };
-}, []);
-
-
-  if (!actor) return null;
-
-  const birthYear = actor.birthday
-    ? new Date(actor.birthday).getFullYear()
-    : null;
-
-  const deathYear = actor.deathday
-    ? new Date(actor.deathday).getFullYear()
-    : null;
-
-  const currentYear = new Date().getFullYear();
-
-  let ageNow: number | string = "—";
-
-  if (birthYear) {
-    if (deathYear) {
-      ageNow = deathYear - birthYear;
-    } else {
-      ageNow = currentYear - birthYear;
-    }
-  }
-
-  const ageInMovie = birthYear ? movieYear - birthYear : "—";
-
-  const sortedMovies = [...movies].sort((a, b) => {
-    if (!a.release_date) return 1;
-    if (!b.release_date) return -1;
-    return (
-      new Date(b.release_date).getTime() - new Date(a.release_date).getTime()
-    );
-  });
-
-    const truncateText = (text: string, maxLength: number): string => {
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + "...";
-  };
-
-  const handleBioClick = () => {
-    if (actor?.biography) {
-      setBioToast(actor.biography);
-      setTimeout(() => setBioToast(null), 5000); // Toast desaparece em 5s
-    }
-  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
-        {/* COLUNA ESQUERDA — ATOR */}
+      <div
+        className="modal modal-wide"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* COLUNA ESQUERDA */}
         <div className="actor-details">
           <div className="actor-scroll">
-            <img
-              src={
-                actor.profile_path
-                  ? `${TMDB_CONFIG.IMAGE_URL}/w300${actor.profile_path}`
-                  : "https://via.placeholder.com/300x450"
-              }
-              alt={actor.name}
-            />
+            {loading && <p>Carregando...</p>}
 
-            <h2>{actor.name}</h2>
+            {!loading && actor && (
+              <>
+                <img
+                  src={
+                    actor.profile_path
+                      ? `https://image.tmdb.org/t/p/w300${actor.profile_path}`
+                      : "https://via.placeholder.com/300x450"
+                  }
+                  alt={actor.name}
+                />
 
-            <p>
-              <strong>Nascimento:</strong>{" "}
-              {actor.birthday
-                ? format(actor.birthday, "dd/MM/yyyy", { locale: ptBR })
-                : "—"}
-            </p>
+                <h2>{actor.name}</h2>
 
-            {actor.deathday && (
-              <p>
-                <strong>Falecimento:</strong>{" "}
-                {actor.deathday
-                  ? format(actor.deathday, "dd/MM/yyyy", { locale: ptBR })
-                  : "—"}
-              </p>
-            )}
-
-            <p>
-              <strong>Idade no filme:</strong> {ageInMovie} anos
-            </p>
-
-            <p>
-              <strong>Idade:</strong>
-              {` ${ageNow} anos`}
-            </p>
-            <p>
-              <strong>Local de Nascimento:</strong>
-              {` ${actor.place_of_birth || "—"}`}
-            </p>
-             <p>
-              <strong>Bio:</strong>
-              {actor.biography ? (
-                <button
-                  onClick={handleBioClick}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    color: "inherit",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    padding: 0,
-                    marginLeft: "0.5em",
-                  }}
-                >
-                  {truncateText(actor.biography, BIOGRAPHY_MAX_LENGTH)}
-                </button>
-              ) : (
-                " —"
-              )}
-            </p>
-              {bioToast && (
-              <div className="toast">
-                {bioToast}
-              </div>
+                <p>
+                  <strong>Nascimento:</strong>{" "}
+                  {actor.birthday || "—"}
+                </p>
+              </>
             )}
           </div>
 
@@ -180,19 +72,19 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* COLUNA DIREITA — FILMES */}
+        {/* COLUNA DIREITA */}
         <div className="actor-movies">
-          <h3>Filmes</h3>
+          <h3>Filmografia</h3>
+
           <ul>
-            {sortedMovies.map((movie) => (
-              <li key={movie.id}>
+            {movies.map((m) => (
+              <li key={m.id}>
                 <div className="movie-title">
-                  {movie.title}
-                  {movie.release_date && (
-                    <span> ({new Date(movie.release_date).getFullYear()})</span>
-                  )}
+                  {m.title}
                 </div>
-                <div className="movie-character">{movie.character}</div>
+                <div className="movie-character">
+                  {m.character}
+                </div>
               </li>
             ))}
           </ul>

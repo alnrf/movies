@@ -25,13 +25,30 @@
 }
 
 /* ==================================================
-   BASE APP
+   BASE / RESET
+================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Roboto", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  color: var(--text-primary);
+  background-color: #fafafa;
+  line-height: 1.4;
+}
+
+/* ==================================================
+   LAYOUT BASE
 ================================================== */
 
 .container {
   max-width: 1000px;
   margin: auto;
-  font-family: Arial, sans-serif;
+  padding: var(--space-lg);
 }
 
 .search-box {
@@ -58,11 +75,58 @@
   text-align: center;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
+  background: var(--bg-white);
 }
 
 .cast-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* ==================================================
+   NAVBAR
+================================================== */
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 var(--space-lg);
+  background-color: #2b2bd6;
+  color: #fff;
+}
+
+.navbar-left {
+  flex: 1;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: var(--font-md);
+  cursor: pointer;
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.back-button:hover {
+  text-decoration: underline;
+}
+
+.navbar-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.navbar-title {
+  font-size: var(--font-lg);
+  font-weight: 600;
+  margin: 0;
 }
 
 /* ==================================================
@@ -80,14 +144,13 @@
 }
 
 /* ==================================================
-   MODAL CONTAINER (NÃO SCROLLA)
+   MODAL CONTAINER
 ================================================== */
 
 .modal {
   background: var(--bg-white);
   border-radius: 8px;
   width: 90%;
-  max-height: 90vh;
   overflow: hidden;
 }
 
@@ -134,11 +197,10 @@
 .actor-details p {
   margin: var(--space-xs) 0;
   font-size: var(--font-md);
-  color: var(--text-primary);
 }
 
 /* ==================================================
-   MODAL FOOTER (FIXO)
+   MODAL FOOTER
 ================================================== */
 
 .modal-footer {
@@ -146,6 +208,10 @@
   border-top: 1px solid var(--border-light);
   display: flex;
   justify-content: center;
+  position: sticky;
+  bottom: 0;
+  background: var(--bg-white);
+  z-index: 1;
 }
 
 /* ==================================================
@@ -167,10 +233,6 @@
   background: #444;
 }
 
-.close-button:focus {
-  outline: 2px solid #aaa;
-}
-
 .close-button:active {
   transform: scale(0.97);
 }
@@ -181,7 +243,6 @@
 
 .actor-movies {
   height: 100%;
-  margin: 20px 0 20px 0 ;
   overflow-y: auto;
   padding: var(--space-lg);
   padding-bottom: var(--space-xl);
@@ -191,7 +252,6 @@
   margin-bottom: var(--space-md);
   font-size: var(--font-lg);
   font-weight: 600;
-  color: var(--text-primary);
 }
 
 .actor-movies ul {
@@ -208,8 +268,6 @@
 .movie-title {
   font-weight: 600;
   font-size: var(--font-md);
-  color: var(--text-primary);
-  line-height: 1.4;
 }
 
 .movie-character {
@@ -219,35 +277,31 @@
 }
 
 /* ==================================================
-   MOBILE RESPONSIVE
+   SKELETON
 ================================================== */
 
-@media (max-width: 768px) {
-  .modal-wide {
-    grid-template-columns: 1fr;
-    height: 90vh;
-  }
+.skeleton {
+  display: flex;
+  gap: 12px;
+  padding: 8px;
+}
 
-  .actor-details {
-    border-right: none;
-    border-bottom: 1px solid var(--border-light);
-  }
+.poster-skeleton {
+  width: 46px;
+  height: 70px;
+  background: #ddd;
+  border-radius: 4px;
+}
 
-  .actor-movies {
-    height: auto;
-    max-height: 40vh;
-    padding: var(--space-md);
-    padding-bottom: var(--space-xl);
-  }
-
-  .actor-details img {
-    max-width: 180px;
-    margin: auto;
-  }
+.text-skeleton {
+  width: 200px;
+  height: 14px;
+  background: #ddd;
+  border-radius: 4px;
 }
 
 /* ==================================================
-   TOAST FOR BIOGRAPHY
+   TOAST
 ================================================== */
 
 .toast {
@@ -259,7 +313,7 @@
   padding: 16px;
   border-radius: 8px;
   max-width: 400px;
-  z-index: 1000;
+  z-index: 1100;
   animation: slideIn 0.3s ease-in-out;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
@@ -272,5 +326,57 @@
   to {
     transform: translateX(0);
     opacity: 1;
+  }
+}
+
+/* ==================================================
+   MOBILE RESPONSIVE (AGRUPADO)
+================================================== */
+
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .navbar {
+    height: 52px;
+    padding: 0 var(--space-md);
+  }
+
+  .navbar-title {
+    font-size: var(--font-lg);
+  }
+
+  .search-box {
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .cast-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-md);
+  }
+
+  .modal-wide {
+    grid-template-columns: 1fr;
+    height: 100vh;
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .actor-details {
+    border-right: none;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  .actor-scroll,
+  .actor-movies {
+    padding: var(--space-md);
+  }
+
+  .actor-details img {
+    max-width: 180px;
+    margin: auto;
   }
 }
