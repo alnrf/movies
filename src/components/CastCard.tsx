@@ -1,29 +1,33 @@
 import { useState } from "react";
 import ActorModal from "./ActorModal";
+import { getProfileUrl } from "../utils/tmdbImage";
 
-export default function CastCard({ actor }: { actor: any }) {
+interface Props {
+  actor: any;
+  launchYear: number;
+}
+
+export default function CastCard({ actor, launchYear }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <div
-        className="cast-card"
-        onClick={() => setOpen(true)}
-      >
+      <div className="cast-card" onClick={() => setOpen(true)}>
         <img
-          src={
-            actor.profile_path
-              ? `https://image.tmdb.org/t/p/w200${actor.profile_path}`
-              : "https://via.placeholder.com/200x300"
-          }
+          src={getProfileUrl(actor.profile_path, "SMALL")}
           alt={actor.name}
         />
-        <p>{actor.name}</p>
+        <p>
+          <strong>{actor.name}</strong>
+        </p>
+        <p>{actor.character || actor.roles?.[0]?.character}</p>
       </div>
 
       {open && (
         <ActorModal
           actorId={actor.id}
+          launchYear={launchYear}
+          open={open}
           onClose={() => setOpen(false)}
         />
       )}

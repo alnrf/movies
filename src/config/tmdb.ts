@@ -11,4 +11,17 @@ export const TMDB_CONFIG = {
     accept: "application/json",
     Authorization: `Bearer ${BEARER_TOKEN}`,
   },
+  IMAGE_BASE_URL: "https://image.tmdb.org/t/p",
+  POSTER_SIZES: {
+    SMALL: "w200",
+    MEDIUM: "w300",
+    LARGE: "w500",
+    ORIGINAL: "original",
+  },
+  BACKDROP_SIZES: {
+    SMALL: "w300",
+    MEDIUM: "w780",
+    LARGE: "w500",
+    ORIGINAL: "original",
+  },
 };

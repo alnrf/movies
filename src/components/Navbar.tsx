@@ -9,12 +9,18 @@ export default function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar-left">
-       
-        <h1 className="navbar-title">MovieSearch</h1>
+        <h1
+          className="navbar-title"
+          onClick={canGoBack ? () => navigate("/") : undefined}
+          aria-label="Home"
+          style={canGoBack ? { cursor: "pointer" } : { cursor: "none" }}
+        >
+          MovieSearch
+        </h1>
       </div>
 
       <div className="navbar-right">
-         {canGoBack && (
+        {canGoBack && (
           <button
             className="back-button"
             onClick={() => navigate(-1)}

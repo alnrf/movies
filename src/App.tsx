@@ -1,9 +1,10 @@
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import MovieDetailPage from "./pages/MovieDetailPage";
-import TVDetailPage from "./pages/TvDetailPage";
+
 import "./styles.css";
 import Navbar from "./components/Navbar";
+import TVDetailPage from "./pages/TVDetailPage";
 
 
 export default function App() {

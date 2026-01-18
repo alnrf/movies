@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  getTvShowDetail,
-  
-  getTvActors,
-} from "../api/tmdbService";
+import { getTvShowDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
+import { format } from "date-fns";
+import { getBackdropUrl } from "../utils/tmdbImage";
 
 export default function TVDetailPage() {
   const { id } = useParams();
@@ -18,7 +16,7 @@ export default function TVDetailPage() {
 
       const [detailRes, creditsRes] = await Promise.all([
         getTvShowDetail(Number(id)),
-        getTvActors(Number(id)), 
+        getCredits("tv", Number(id)),
       ]);
 
       setTv(detailRes.data);
@@ -30,28 +28,30 @@ export default function TVDetailPage() {
 
   if (!tv) return null;
 
+  const launchYear = tv.first_air_date
+    ? new Date(tv.first_air_date).getFullYear()
+    : null;
+
   return (
     <div className="container">
       {tv.backdrop_path && (
-        <img
-          src={`https://image.tmdb.org/t/p/w780${tv.backdrop_path}`}
-          alt={tv.name}
-        />
+        <img src={getBackdropUrl(tv.backdrop_path, "LARGE")} alt={tv.name} />
       )}
 
       <h1>{tv.name}</h1>
-
       <p>{tv.overview}</p>
-
       <p>
-        <strong>First air date:</strong>{" "}
-        {tv.first_air_date}
+        <strong>Primeiro Episódio:</strong>{" "}
+        {format(tv.first_air_date, "dd/MM/yyyy")}
       </p>
 
       <div className="cast-grid">
-        {cast.map((actor) => (
-          <CastCard key={actor.id} actor={actor} />
-        ))}
+        {cast.map(
+          (actor) =>
+            launchYear && (
+              <CastCard key={actor.id} launchYear={launchYear} actor={actor} />
+            ),
+        )}
       </div>
     </div>
   );

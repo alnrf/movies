@@ -25,7 +25,7 @@ export default function SearchForm({
       <input
         value={query}
         onChange={(e) => onQueryChange(e.target.value)}
-        placeholder="Search..."
+        placeholder="Pesquisar..."
       />
 
       <div>
@@ -35,7 +35,7 @@ export default function SearchForm({
             checked={type === "movie"}
             onChange={() => onTypeChange("movie")}
           />
-          Movies
+          Filmes
         </label>
 
         <label>
@@ -44,7 +44,7 @@ export default function SearchForm({
             checked={type === "tv"}
             onChange={() => onTypeChange("tv")}
           />
-          TV Shows
+          Seriados
         </label>
 
         <label>
@@ -53,7 +53,7 @@ export default function SearchForm({
             checked={type === "person"}
             onChange={() => onTypeChange("person")}
           />
-          People
+          Atores
         </label>
       </div>
 

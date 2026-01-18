@@ -46,3 +46,13 @@ export const getActorMovies = (actorId: number) =>
   tmdbClient.get(`/person/${actorId}/movie_credits`, {
     params: { language: defaultParams.language },
   });
+export const getActorTv = (actorId: number) =>
+  tmdbClient.get(`/person/${actorId}/tv_credits`, {
+    params: { language: defaultParams.language },
+  });
+
+  export const getCredits = (
+  mediaType: "movie" | "tv",
+  id: number
+) => tmdbClient.get(`/${mediaType}/${id}/${mediaType === "movie" ? "credits" : "aggregate_credits"}`);
+
