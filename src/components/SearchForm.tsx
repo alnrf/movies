@@ -1,3 +1,13 @@
+import {
+  Input,
+  InputGroup,
+  InputLeftElement,
+  RadioGroup,
+  Radio,
+  Button,
+  Stack,
+} from "@chakra-ui/react";
+import { SearchIcon } from "@chakra-ui/icons";
 import type { SearchType } from "../types/SearchType";
 
 interface Props {
@@ -22,42 +32,43 @@ export default function SearchForm({
         onSearch();
       }}
     >
-      <input
-        value={query}
-        onChange={(e) => onQueryChange(e.target.value)}
-        placeholder="Pesquisar..."
-      />
+      {/* INPUT */}
+      <InputGroup>
+        <InputLeftElement pointerEvents="none">
+          <SearchIcon color="gray.400" />
+        </InputLeftElement>
 
-      <div>
-        <label>
-          <input
-            type="radio"
-            checked={type === "movie"}
-            onChange={() => onTypeChange("movie")}
-          />
-          Filmes
-        </label>
+        <Input
+          value={query}
+          onChange={(e) => onQueryChange(e.target.value)}
+          placeholder="Pesquisar..."
+        />
+      </InputGroup>
 
-        <label>
-          <input
-            type="radio"
-            checked={type === "tv"}
-            onChange={() => onTypeChange("tv")}
-          />
-          Seriados
-        </label>
+      {/* RADIOS */}
+      <RadioGroup
+        value={type}
+        onChange={(value) =>
+          onTypeChange(value as SearchType)
+        }
+        mt={4}
+      >
+        <Stack direction="row" spacing={4}>
+          <Radio value="movie">Filmes</Radio>
+          <Radio value="tv">Seriados</Radio>
+          <Radio value="person">Atores</Radio>
+        </Stack>
+      </RadioGroup>
 
-        <label>
-          <input
-            type="radio"
-            checked={type === "person"}
-            onChange={() => onTypeChange("person")}
-          />
-          Atores
-        </label>
-      </div>
-
-      <button type="submit">Buscar</button>
+      {/* BUTTON */}
+      <Button
+        type="submit"
+        mt={4}
+        colorScheme="blue"
+        width="100%"
+      >
+        Buscar
+      </Button>
     </form>
   );
 }
