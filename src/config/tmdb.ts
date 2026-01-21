@@ -13,6 +13,7 @@ export const TMDB_CONFIG = {
   },
   IMAGE_BASE_URL: "https://image.tmdb.org/t/p",
   POSTER_SIZES: {
+    XSMALL: "w92",
     SMALL: "w200",
     MEDIUM: "w300",
     LARGE: "w500",
