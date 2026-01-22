@@ -1,7 +1,31 @@
-import * as Dialog from "@radix-ui/react-dialog";
 import { useEffect, useState } from "react";
 import { getActorDetail, getActorMovies, getActorTv } from "../api/tmdbService";
 import { getProfileUrl } from "../utils/tmdbImage";
+import {
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  Box,
+  Image,
+  Text,
+  Heading,
+  Stack,
+  Divider,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  Badge,
+  Grid,
+  Stat,
+  StatLabel,
+  StatNumber,
+} from "@chakra-ui/react";
+import { getYearFromDate } from "../utils/date";
 
 interface Props {
   actorId: number;
@@ -52,13 +76,9 @@ export default function ActorModal({
     };
   }, [actorId, open]);
 
-  const birthYear = actor?.birthday
-    ? new Date(actor.birthday).getFullYear()
-    : null;
+  const birthYear = getYearFromDate(actor?.birthday);
 
-  const deathYear = actor?.deathday
-    ? new Date(actor.deathday).getFullYear()
-    : null;
+  const deathYear = getYearFromDate(actor?.deathday);
 
   const currentYear = new Date().getFullYear();
 
@@ -70,63 +90,206 @@ export default function ActorModal({
 
   const ageInMovie = birthYear && launchYear ? launchYear - birthYear : null;
 
+  const sortedMovies = [...movies].sort((a, b) => {
+    const yearA = a.release_date ? new Date(a.release_date).getFullYear() : 0;
+    const yearB = b.release_date ? new Date(b.release_date).getFullYear() : 0;
+
+    return yearB - yearA; // mais recentes primeiro
+  });
+
+  const sortedTv = [...tv].sort((a, b) => {
+    const yearA = a.first_air_date
+      ? new Date(a.first_air_date).getFullYear()
+      : 0;
+    const yearB = b.first_air_date
+      ? new Date(b.first_air_date).getFullYear()
+      : 0;
+
+    return yearB - yearA;
+  });
+
   return (
-    <Dialog.Root open={open} onOpenChange={(v) => !v && onClose()}>
-      <Dialog.Portal>
-        <Dialog.Overlay className="modal-overlay" />
-        <Dialog.Content className="modal modal-wide">
-          <Dialog.Title className="sr-only">Detalhes do ator</Dialog.Title>
-          <div className="actor-details">
-            <div className="actor-scroll">
-              {loading && <p>Carregando...</p>}
-              {!loading && actor && (
-                <>
-                 <img
-  src={getProfileUrl(actor.profile_path, "MEDIUM")}
-  alt={actor.name}
-/>
-                  <h2>{actor.name}</h2>
-                  <p>
-                    <strong>Nascimento:</strong> {actor.birthday || "—"}
-                  </p>
-                  {actor.deathday && (
-                    <p>
-                      <strong>Falecimento:</strong> {actor.deathday}
-                    </p>
-                  )}
-                  <p>
-                    <strong>Idade:</strong> {ageNow} anos
-                  </p>
+    <Modal
+      isOpen={open}
+      onClose={onClose}
+      size="6xl"
+      scrollBehavior="inside"
+      isCentered
+    >
+      <ModalOverlay />
+
+      <ModalContent maxH="90vh">
+        <ModalHeader>Detalhes do ator</ModalHeader>
+        <ModalCloseButton />
+
+        <ModalBody>
+          {loading && <Text>Carregando...</Text>}
+
+          {!loading && actor && (
+            <Stack
+              direction={{ base: "column", md: "row" }}
+              spacing={6}
+              align="stretch"
+              height="100%"
+            >
+              {/* COLUNA ESQUERDA — FOTO + DADOS */}
+              <Box
+                flexShrink={0}
+                w={{ base: "100%", md: "260px" }}
+                textAlign="center"
+              >
+                <Image
+                  src={getProfileUrl(actor.profile_path, "MEDIUM")}
+                  alt={actor.name}
+                  borderRadius="md"
+                  mb={4}
+                  mx="auto"
+                  maxW={{ base: "160px", md: "220px" }}
+                />
+
+                <Heading size="md">{actor.name}</Heading>
+
+                <Grid
+                  templateColumns={{
+                    base: "1fr 1fr",
+                    md: "repeat(3, 1fr)",
+                  }}
+                  gap={6}
+                  mt={4}
+                >
+                  <Stat textAlign="center">
+                    <StatLabel>Nascimento</StatLabel>
+                    <StatNumber fontSize="md" whiteSpace="nowrap">
+                      {actor.birthday || "—"}
+                    </StatNumber>
+                  </Stat>
+
+                  <Stat textAlign="center">
+                    <StatLabel>Idade</StatLabel>
+                    <StatNumber fontSize="md">{ageNow} anos</StatNumber>
+                  </Stat>
+
                   {launchYear && ageInMovie !== null && (
-                    <p>
-                      <strong>Idade no filme:</strong> {ageInMovie} anos
-                    </p>
+                    <Stat textAlign="center">
+                      <StatLabel>Idade no filme</StatLabel>
+                      <StatNumber fontSize="md">{ageInMovie} anos</StatNumber>
+                    </Stat>
                   )}
-                </>
-              )}
-            </div>
+                </Grid>
+              </Box>
 
-            <div className="modal-footer">
-              <Dialog.Close asChild>
-                <button className="close-button">Fechar</button>
-              </Dialog.Close>
-            </div>
-          </div>
+              {/* COLUNA DIREITA — TABS */}
+              <Box
+                flex="1"
+                display="flex"
+                flexDirection="column"
+                minH={{ base: "auto", md: "0" }}
+              >
+                <Tabs
+                  variant="enclosed"
+                  colorScheme="blue"
+                  display="flex"
+                  flexDirection="column"
+                  height="100%"
+                >
+                  <TabList>
+                    <Tab>Filmes</Tab>
+                    <Tab>Seriados</Tab>
+                  </TabList>
 
-          <div className="actor-movies">
-            <h3>Filmografia</h3>
+                  <TabPanels flex="1" overflow="hidden">
+                    {/* FILMES */}
+                    <TabPanel
+                      px={0}
+                      pt={4}
+                      overflowY="auto"
+                      maxH={{ base: "auto", md: "calc(90vh - 220px)" }}
+                    >
+                      {sortedMovies.length === 0 ? (
+                        <Text color="gray.500">Nenhum filme encontrado.</Text>
+                      ) : (
+                        <Stack spacing={3}>
+                          {sortedMovies.map((m) => {
+                            const year = m.release_date
+                              ? new Date(m.release_date).getFullYear()
+                              : "—";
 
-            <ul>
-              {movies.map((m) => (
-                <li key={m.id}>
-                  <div className="movie-title">{m.title}</div>
-                  <div className="movie-character">{m.character}</div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+                            return (
+                              <Box key={m.id}>
+                                <Stack
+                                  direction="row"
+                                  align="center"
+                                  spacing={2}
+                                >
+                                  <Text fontWeight="semibold">
+                                    {m.title} ({year})
+                                  </Text>
+
+                                  <Badge colorScheme="blue">Filme</Badge>
+                                </Stack>
+
+                                <Text fontSize="sm" color="gray.600">
+                                  {m.character}
+                                </Text>
+
+                                <Divider mt={2} />
+                              </Box>
+                            );
+                          })}
+                        </Stack>
+                      )}
+                    </TabPanel>
+
+                    {/* TV SHOWS */}
+                    <TabPanel
+                      px={0}
+                      pt={4}
+                      overflowY="auto"
+                      maxH="calc(90vh - 200px)"
+                    >
+                      {sortedTv.length === 0 ? (
+                        <Text color="gray.500">
+                          Nenhum programa de TV encontrado.
+                        </Text>
+                      ) : (
+                        <Stack spacing={3}>
+                          {sortedTv.map((t) => {
+                            const year = t.first_air_date
+                              ? new Date(t.first_air_date).getFullYear()
+                              : "—";
+
+                            return (
+                              <Box key={t.id}>
+                                <Stack
+                                  direction="row"
+                                  align="center"
+                                  spacing={2}
+                                >
+                                  <Text fontWeight="semibold">
+                                    {t.name} ({year})
+                                  </Text>
+
+                                  <Badge colorScheme="purple">TV</Badge>
+                                </Stack>
+
+                                <Text fontSize="sm" color="gray.600">
+                                  {t.character}
+                                </Text>
+
+                                <Divider mt={2} />
+                              </Box>
+                            );
+                          })}
+                        </Stack>
+                      )}
+                    </TabPanel>
+                  </TabPanels>
+                </Tabs>
+              </Box>
+            </Stack>
+          )}
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 }

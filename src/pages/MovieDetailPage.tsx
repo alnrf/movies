@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { getBackdropUrl } from "../utils/tmdbImage";
 import { Grid } from "@chakra-ui/react/grid";
 import { Badge, Box, Heading, Image, Stack, Text } from "@chakra-ui/react";
+import { getYearFromDate } from "../utils/date";
 
 export default function MovieDetailPage() {
   const { id } = useParams();
@@ -28,9 +29,12 @@ export default function MovieDetailPage() {
 
   if (!movie) return null;
 
-  const launchYear = movie.release_date
-    ? new Date(movie.release_date).getFullYear()
-    : null;
+  const launchYear = getYearFromDate(movie.release_date);
+
+  const currency = {
+    style: "currency",
+    currency: "BRL",
+  };
 
   return (
     <Box maxW="1000px" mx="auto" p={4}>
@@ -61,25 +65,30 @@ export default function MovieDetailPage() {
       <Heading as="h3" size="md" mb={3} mt={6}>
         Informações do Filme
       </Heading>
-      <p>
-        <strong>Lançamento:</strong> {format(movie.release_date, "dd/MM/yyyy")}
-      </p>
-      <p>
-        <strong>Título Original:</strong> {movie.original_title}
-      </p>
-      <p>
-        <strong>Orçamento:</strong>{" "}
-        {movie.budget.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        })}
-        {" / "}
-        <strong>Faturamento:</strong>{" "}
-        {movie.revenue.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        })}
-      </p>
+      <Text>
+        <Text as="span" fontWeight="semibold">
+          Lançamento:
+        </Text>{" "}
+        {format(movie.release_date, "dd/MM/yyyy")}
+      </Text>
+      <Text>
+        <Text as="span" fontWeight="semibold">
+          Título original:
+        </Text>{" "}
+        {movie.original_title}
+      </Text>
+      <Text>
+        <Text as="span" fontWeight="semibold">
+          Orçamento:
+        </Text>{" "}
+        {movie.budget.toLocaleString("pt-BR", currency)}
+      </Text>
+      <Text>
+        <Text as="span" fontWeight="semibold">
+          Faturamento:
+        </Text>{" "}
+        {movie.revenue.toLocaleString("pt-BR", currency)}
+      </Text>
       <Stack direction="row" mb={3} mt={3} spacing={2}>
         {movie.genres.map((genre: any) => (
           <Badge key={genre.id}>{genre.name}</Badge>
@@ -89,7 +98,15 @@ export default function MovieDetailPage() {
       <Heading as="h3" size="md" mb={3} mt={6}>
         Elenco do Filme
       </Heading>
-      <Grid templateColumns="repeat(4, 1fr)" gap={6} mt={4}>
+      <Grid
+        templateColumns={{
+          base: "1fr", // mobile
+          md: "repeat(2, 1fr)", // tablet (opcional)
+          lg: "repeat(5, 1fr)", // desktop
+        }}
+        gap={6}
+        mt={4}
+      >
         {cast.map(
           (actor) =>
             launchYear && (

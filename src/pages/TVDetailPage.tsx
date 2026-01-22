@@ -4,6 +4,8 @@ import { getTvShowDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
 import { format } from "date-fns";
 import { getBackdropUrl } from "../utils/tmdbImage";
+import { getYearFromDate } from "../utils/date";
+import { Box, Grid, Heading, Image, Stack, Text } from "@chakra-ui/react";
 
 export default function TVDetailPage() {
   const { id } = useParams();
@@ -28,31 +30,60 @@ export default function TVDetailPage() {
 
   if (!tv) return null;
 
-  const launchYear = tv.first_air_date
-    ? new Date(tv.first_air_date).getFullYear()
-    : null;
+  const launchYear = getYearFromDate(tv.first_air_date);
+    
 
   return (
-    <div className="container">
+    <Box maxW="1000px" mx="auto" p={4}>
+
+       <Stack
+              direction={{ base: "column", md: "row" }}
+              spacing={6}
+              align="flex-start"
+            >
       {tv.backdrop_path && (
-        <img src={getBackdropUrl(tv.backdrop_path, "LARGE")} alt={tv.name} />
+        <Image src={getBackdropUrl(tv.backdrop_path, "LARGE")} alt={tv.name} borderRadius="md"
+          maxW={{ base: "100%", md: "420px" }}
+          objectFit="cover"/>
       )}
-
-      <h1>{tv.name}</h1>
-      <p>{tv.overview}</p>
-      <p>
-        <strong>Primeiro Episódio:</strong>{" "}
+<Box>
+      <Heading as="h1" size="lg" mb={3}>
+                  {tv.name}
+                </Heading>
+       <Text fontSize="md" color="gray.700">
+                  {tv.overview}
+                </Text>
+</Box>
+      </Stack>
+        <Heading as="h3" size="md" mb={3} mt={6}>
+        Informações do Programa
+      </Heading>
+      <Text>
+        <Text as="span" fontWeight="semibold">
+          Primeiro Episódio:
+        </Text>{" "}
         {format(tv.first_air_date, "dd/MM/yyyy")}
-      </p>
+      </Text>
+       <Heading as="h3" size="md" mb={3} mt={6}>
+        Elenco do Programa
+      </Heading>
 
-      <div className="cast-grid">
+       <Grid
+              templateColumns={{
+                base: "1fr", // mobile
+                md: "repeat(2, 1fr)", // tablet (opcional)
+                lg: "repeat(5, 1fr)", // desktop
+              }}
+              gap={6}
+              mt={4}
+            >
         {cast.map(
           (actor) =>
             launchYear && (
               <CastCard key={actor.id} launchYear={launchYear} actor={actor} />
             ),
         )}
-      </div>
-    </div>
+      </Grid>
+    </Box>
   );
 }
