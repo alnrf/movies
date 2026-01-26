@@ -26,6 +26,7 @@ import {
   StatNumber,
 } from "@chakra-ui/react";
 import { getYearFromDate } from "../utils/date";
+import { useSortByDate } from "../hooks/useSortByDate";
 
 interface Props {
   actorId: number;
@@ -90,23 +91,8 @@ export default function ActorModal({
 
   const ageInMovie = birthYear && launchYear ? launchYear - birthYear : null;
 
-  const sortedMovies = [...movies].sort((a, b) => {
-    const yearA = a.release_date ? new Date(a.release_date).getFullYear() : 0;
-    const yearB = b.release_date ? new Date(b.release_date).getFullYear() : 0;
-
-    return yearB - yearA; // mais recentes primeiro
-  });
-
-  const sortedTv = [...tv].sort((a, b) => {
-    const yearA = a.first_air_date
-      ? new Date(a.first_air_date).getFullYear()
-      : 0;
-    const yearB = b.first_air_date
-      ? new Date(b.first_air_date).getFullYear()
-      : 0;
-
-    return yearB - yearA;
-  });
+  const sortedMovies = useSortByDate(movies, "release_date");
+  const sortedTv = useSortByDate(tv, "first_air_date");
 
   return (
     <Modal
@@ -228,6 +214,9 @@ export default function ActorModal({
                                   <Badge colorScheme="blue">Filme</Badge>
                                 </Stack>
 
+                            { m.original_title  !== m.title && <Text fontSize="sm" color="gray.600">
+                                  {m.original_title}
+                                </Text>}
                                 <Text fontSize="sm" color="gray.600">
                                   {m.character}
                                 </Text>
@@ -271,7 +260,11 @@ export default function ActorModal({
 
                                   <Badge colorScheme="purple">TV</Badge>
                                 </Stack>
-
+                                {t.name !== t.original_name && (
+                                  <Text fontSize="sm" color="gray.600">
+                                    {t.original_name}
+                                  </Text>
+                                )}
                                 <Text fontSize="sm" color="gray.600">
                                   {t.character}
                                 </Text>

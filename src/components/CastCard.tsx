@@ -1,8 +1,8 @@
 import { useState } from "react";
 import ActorModal from "./ActorModal";
 import { getProfileUrl } from "../utils/tmdbImage";
-import { Card, CardBody, CardFooter } from "@chakra-ui/react/card";
-import { Button, Divider, Heading, Image, Stack, Text } from "@chakra-ui/react";
+import { Card, CardBody } from "@chakra-ui/react/card";
+import { Heading, Image, Stack, Text } from "@chakra-ui/react";
 
 interface Props {
   actor: any;
@@ -18,6 +18,7 @@ export default function CastCard({ actor, launchYear }: Props) {
         <Card
           maxW="sm"
           transition="transform 0.15s ease, box-shadow 0.15s ease"
+          onClick={() => setOpen(true)}
           _hover={{
             transform: "translateY(-2px)",
             boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
@@ -36,16 +37,6 @@ export default function CastCard({ actor, launchYear }: Props) {
               <Text>{actor.character || actor.roles?.[0]?.character}</Text>
             </Stack>
           </CardBody>
-          <Divider />
-          <CardFooter justifyContent="center">
-            <Button
-              variant="solid"
-              colorScheme="blue"
-              onClick={() => setOpen(true)}
-            >
-              Detalhes
-            </Button>
-          </CardFooter>
         </Card>
       </>
 
