@@ -265,9 +265,20 @@ export default function ActorModal({
                                     {t.original_name}
                                   </Text>
                                 )}
+                                <Stack
+                                  direction="row"
+                                  align="center"
+                                  spacing={2}>
+
                                 <Text fontSize="sm" color="gray.600">
                                   {t.character}
                                 </Text>
+                                {t.episode_count && (
+                                  <Text fontSize="sm" color="gray.600">
+                                    - Episódios: {t.episode_count}
+                                  </Text>
+                                )}
+                                </Stack>
 
                                 <Divider mt={2} />
                               </Box>
