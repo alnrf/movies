@@ -110,7 +110,7 @@ export default function MovieDetailPage() {
         {cast.map(
           (actor) =>
             launchYear && (
-              <CastCard key={actor.id} launchYear={launchYear} actor={actor} />
+              <CastCard key={actor.id} actor={actor} />
             ),
         )}
       </Grid>

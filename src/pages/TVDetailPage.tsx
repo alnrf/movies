@@ -156,7 +156,6 @@ export default function TVDetailPage() {
               launchYear && (
                 <CastCard
                   key={actor.id}
-                  launchYear={launchYear}
                   actor={actor}
                 />
               ),

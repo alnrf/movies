@@ -30,12 +30,10 @@ interface Props {
   actorId: number;
   open: boolean;
   onClose: () => void;
-  launchYear?: number | null;
 }
 
 export default function ActorModal({
   actorId,
-  launchYear = null,
   open,
   onClose,
 }: Props) {

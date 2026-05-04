@@ -6,10 +6,9 @@ import { Heading, Image, Stack, Text } from "@chakra-ui/react";
 
 interface Props {
   actor: any;
-  launchYear?: number;
 }
 
-export default function CastCard({ actor, launchYear }: Props) {
+export default function CastCard({ actor }: Props) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -44,7 +43,6 @@ export default function CastCard({ actor, launchYear }: Props) {
       {open && (
         <ActorModal
           actorId={actor.id}
-          launchYear={launchYear}
           open={open}
           onClose={() => setOpen(false)}
         />

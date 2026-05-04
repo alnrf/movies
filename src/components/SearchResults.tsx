@@ -8,7 +8,7 @@ import { Heading } from "@chakra-ui/react/typography";
 import { getPosterUrl } from "../utils/tmdbImage";
 import { Button } from "@chakra-ui/react/button";
 
-export default function SearchResults({ results, type, launchYear }: any) {
+export default function SearchResults({ results, type }: any) {
   const navigate = useNavigate();
   const [selectedActor, setSelectedActor] = useState<number | null>(null);
 
@@ -58,7 +58,6 @@ export default function SearchResults({ results, type, launchYear }: any) {
       {selectedActor !== null && (
         <ActorModal
           actorId={selectedActor}
-          launchYear={launchYear}
           open={true}
           onClose={() => setSelectedActor(null)}
         />
