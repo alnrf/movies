@@ -6,7 +6,7 @@ import { Heading, Image, Stack, Text } from "@chakra-ui/react";
 
 interface Props {
   actor: any;
-  launchYear: number;
+  launchYear?: number;
 }
 
 export default function CastCard({ actor, launchYear }: Props) {
@@ -19,6 +19,7 @@ export default function CastCard({ actor, launchYear }: Props) {
           maxW="sm"
           transition="transform 0.15s ease, box-shadow 0.15s ease"
           onClick={() => setOpen(true)}
+          cursor="pointer"
           _hover={{
             transform: "translateY(-2px)",
             boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",

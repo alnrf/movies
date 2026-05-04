@@ -56,3 +56,10 @@ export const getActorTv = (actorId: number) =>
   id: number
 ) => tmdbClient.get(`/${mediaType}/${id}/${mediaType === "movie" ? "credits" : "aggregate_credits"}`);
 
+/* SEASON & EPISODE */
+export const getTvSeasonDetails = (tvId: number, seasonNumber: number) =>
+  tmdbClient.get(`/tv/${tvId}/season/${seasonNumber}`, { params: { language: defaultParams.language } });
+
+export const getTvEpisodeDetails = (tvId: number, seasonNumber: number, episodeNumber: number) =>
+  tmdbClient.get(`/tv/${tvId}/season/${seasonNumber}/episode/${episodeNumber}`, { params: { language: defaultParams.language } });
+

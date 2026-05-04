@@ -20,6 +20,7 @@ export const TMDB_CONFIG = {
     ORIGINAL: "original",
   },
   BACKDROP_SIZES: {
+       XSMALL: "w92",
     SMALL: "w300",
     MEDIUM: "w780",
     LARGE: "w500",

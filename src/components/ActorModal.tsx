@@ -20,12 +20,10 @@ import {
   Tab,
   TabPanel,
   Badge,
-  Grid,
-  Stat,
-  StatLabel,
-  StatNumber,
+
+  Flex,
 } from "@chakra-ui/react";
-import { getYearFromDate } from "../utils/date";
+import { getYearFromDate, formatDate, calculateAgeDetailed } from "../utils/date";
 import { useSortByDate } from "../hooks/useSortByDate";
 
 interface Props {
@@ -79,17 +77,11 @@ export default function ActorModal({
 
   const birthYear = getYearFromDate(actor?.birthday);
 
-  const deathYear = getYearFromDate(actor?.deathday);
+  let ageNow: string = "—";
 
-  const currentYear = new Date().getFullYear();
-
-  let ageNow: number | string = "—";
-
-  if (birthYear) {
-    ageNow = deathYear ? deathYear - birthYear : currentYear - birthYear;
+  if (actor?.birthday) {
+    ageNow = calculateAgeDetailed(actor.birthday, actor?.deathday);
   }
-
-  const ageInMovie = birthYear && launchYear ? launchYear - birthYear : null;
 
   const sortedMovies = useSortByDate(movies, "release_date");
   const sortedTv = useSortByDate(tv, "first_air_date");
@@ -135,33 +127,32 @@ export default function ActorModal({
 
                 <Heading size="md">{actor.name}</Heading>
 
-                <Grid
-                  templateColumns={{
-                    base: "1fr 1fr",
-                    md: "repeat(3, 1fr)",
-                  }}
-                  gap={6}
+                <Flex direction="column" 
+                  gap={3}
                   mt={4}
                 >
-                  <Stat textAlign="center">
-                    <StatLabel>Nascimento</StatLabel>
-                    <StatNumber fontSize="md" whiteSpace="nowrap">
-                      {actor.birthday || "—"}
-                    </StatNumber>
-                  </Stat>
-
-                  <Stat textAlign="center">
-                    <StatLabel>Idade</StatLabel>
-                    <StatNumber fontSize="md">{ageNow} anos</StatNumber>
-                  </Stat>
-
-                  {launchYear && ageInMovie !== null && (
-                    <Stat textAlign="center">
-                      <StatLabel>Idade no filme</StatLabel>
-                      <StatNumber fontSize="md">{ageInMovie} anos</StatNumber>
-                    </Stat>
+                  <Flex direction="row" textAlign="center" gap={2}>
+                    <Text fontWeight="semibold">Nascimento:</Text>
+                    <Text fontSize="md" whiteSpace="nowrap">
+                      {formatDate(actor.birthday) || "—"}
+                    </Text>
+                  </Flex>
+                 { actor.deathday && (
+                    <Flex direction="row" textAlign="center" gap={2}>
+                      <Text fontWeight="semibold">Falecimento:</Text>
+                      <Text fontSize="md" whiteSpace="nowrap">
+                        {formatDate(actor.deathday) || "—"}
+                      </Text>
+                    </Flex>
                   )}
-                </Grid>
+
+                  <Flex direction="row" textAlign="center" gap={2}>
+                    <Text fontWeight="semibold">Idade:</Text>
+                    <Text fontSize="md">{ageNow}</Text>
+                  </Flex>
+
+               
+                </Flex>
               </Box>
 
               {/* COLUNA DIREITA — TABS */}
@@ -181,6 +172,8 @@ export default function ActorModal({
                   <TabList>
                     <Tab>Filmes</Tab>
                     <Tab>Seriados</Tab>
+                    <Tab>Informações</Tab>
+                    <Tab>Fotos</Tab>
                   </TabList>
 
                   <TabPanels flex="1" overflow="hidden">
@@ -220,6 +213,14 @@ export default function ActorModal({
                                 <Text fontSize="sm" color="gray.600">
                                   {m.character}
                                 </Text>
+                                <Flex direction="row" align="center" gap={2}>
+                                   <Text fontSize="sm" color="gray.600">
+                                  Idade:
+                                </Text>
+                                  <Text fontSize="sm" color="gray.600">
+                                  {year && birthYear && typeof year === "number" && typeof birthYear === "number" ? year - birthYear : "—"} anos
+                                </Text>
+                              </Flex>
 
                                 <Divider mt={2} />
                               </Box>
@@ -245,6 +246,9 @@ export default function ActorModal({
                           {sortedTv.map((t) => {
                             const year = t.first_air_date
                               ? new Date(t.first_air_date).getFullYear()
+                              : "—";
+                            const creditYear = t.first_credit_air_date
+                              ? new Date(t.first_credit_air_date).getFullYear()
                               : "—";
 
                             return (
@@ -279,6 +283,11 @@ export default function ActorModal({
                                   </Text>
                                 )}
                                 </Stack>
+                                <Flex direction="row" align="center" gap={2}>
+                                   <Text fontSize="sm" color="gray.600">
+                                  Idade: {creditYear && birthYear && typeof creditYear === "number" && typeof birthYear === "number" ? creditYear - birthYear : "—"} anos
+                                </Text>
+                                </Flex>
 
                                 <Divider mt={2} />
                               </Box>
