@@ -1,40 +1,76 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { getMovieDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
 import { format } from "date-fns";
 import { getBackdropUrl } from "../utils/tmdbImage";
 import { Grid } from "@chakra-ui/react/grid";
-import { Badge, Box, Heading, Image, Stack, Text } from "@chakra-ui/react";
-import { getYearFromDate } from "../utils/date";
+import {
+  Badge,
+  Box,
+  Button,
+  Heading,
+  Image,
+  Spinner,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
 
 export default function MovieDetailPage() {
   const { id } = useParams();
-  const [movie, setMovie] = useState<any>(null);
-  const [cast, setCast] = useState<any[]>([]);
+  const navigate = useNavigate();
+  const numericId = Number(id);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["movie", numericId],
+    queryFn: async () => {
+      const [detail, credits] = await Promise.all([
+        getMovieDetail(numericId),
+        getCredits("movie", numericId),
+      ]);
+      return { movie: detail.data, cast: credits.data.cast as any[] };
+    },
+    enabled: !isNaN(numericId),
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      const [detail, credits] = await Promise.all([
-        getMovieDetail(Number(id)),
-        getCredits("movie", Number(id)),
-      ]);
+    if (data?.movie) document.title = `${data.movie.title} — Movies`;
+    return () => { document.title = "Movies"; };
+  }, [data?.movie]);
 
-      setMovie(detail.data);
-      setCast(credits.data.cast);
-    }
+  if (!id || isNaN(numericId)) {
+    navigate("/404", { replace: true });
+    return null;
+  }
 
-    fetchData();
-  }, [id]);
+  if (isLoading) {
+    return (
+      <Box textAlign="center" mt={20}>
+        <Spinner size="xl" />
+      </Box>
+    );
+  }
 
-  if (!movie) return null;
+  if (isError || !data?.movie) {
+    return (
+      <Box textAlign="center" py={20} px={6}>
+        <Heading size="lg" mb={4}>
+          Filme não encontrado
+        </Heading>
+        <Text color="gray.500" mb={6}>
+          Não foi possível carregar as informações deste filme.
+        </Text>
+        <Button colorScheme="teal" onClick={() => navigate("/")}>
+          Voltar para a busca
+        </Button>
+      </Box>
+    );
+  }
 
-  const launchYear = getYearFromDate(movie.release_date);
+  const { movie, cast } = data;
 
-  const currency = {
-    style: "currency",
-    currency: "BRL",
-  };
+  const currency = { style: "currency", currency: "BRL" };
 
   return (
     <Box maxW="1000px" mx="auto" p={4}>
@@ -55,7 +91,6 @@ export default function MovieDetailPage() {
           <Heading as="h1" size="lg" mb={3}>
             {movie.title}
           </Heading>
-
           <Text fontSize="md" color="gray.700">
             {movie.overview}
           </Text>
@@ -100,19 +135,16 @@ export default function MovieDetailPage() {
       </Heading>
       <Grid
         templateColumns={{
-          base: "1fr", // mobile
-          md: "repeat(2, 1fr)", // tablet (opcional)
-          lg: "repeat(5, 1fr)", // desktop
+          base: "1fr",
+          md: "repeat(2, 1fr)",
+          lg: "repeat(5, 1fr)",
         }}
         gap={6}
         mt={4}
       >
-        {cast.map(
-          (actor) =>
-            launchYear && (
-              <CastCard key={actor.id} actor={actor} />
-            ),
-        )}
+        {cast.map((actor) => (
+          <CastCard key={actor.id} actor={actor} />
+        ))}
       </Grid>
     </Box>
   );

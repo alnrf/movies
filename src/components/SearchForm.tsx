@@ -2,12 +2,14 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  InputRightElement,
+  IconButton,
   RadioGroup,
   Radio,
   Button,
   Stack,
 } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
+import { SearchIcon, CloseIcon } from "@chakra-ui/icons";
 import type { SearchType } from "../types/SearchType";
 
 interface Props {
@@ -42,7 +44,19 @@ export default function SearchForm({
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
           placeholder="Pesquisar..."
+          pr={query ? "2.5rem" : undefined}
         />
+        {query && (
+          <InputRightElement>
+            <IconButton
+              aria-label="Limpar busca"
+              icon={<CloseIcon boxSize={2.5} />}
+              size="xs"
+              variant="ghost"
+              onClick={() => onQueryChange("")}
+            />
+          </InputRightElement>
+        )}
       </InputGroup>
 
       {/* RADIOS */}

@@ -7,19 +7,13 @@
   --space-sm: 8px;
   --space-md: 12px;
   --space-lg: 20px;
-  --space-xl: 25px;
 
-  --font-sm: 12px;
   --font-md: 14px;
-  --font-lg: 16px;
-  --font-xl: 18px;
 
   --text-primary: #111;
-  --text-secondary: #666;
   --border-light: #e5e5e5;
 
   --bg-white: #fff;
-  --bg-overlay: rgba(0, 0, 0, 0.6);
 }
 
 /* ==================================================
@@ -49,36 +43,6 @@ body {
   padding: var(--space-lg);
 }
 
-.cast-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: var(--space-lg);
-}
-
-.cast-card {
-  border: 1px solid var(--border-light);
-  padding: var(--space-md);
-  text-align: center;
-  cursor: pointer;
-  background: var(--bg-white);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.cast-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-}
-
-.cast-card img {
-  width: 100%;
-  border-radius: 6px;
-}
-
-.cast-card p {
-  margin-top: var(--space-sm);
-  font-size: var(--font-md);
-}
-
 /* ==================================================
    NAVBAR
 ================================================== */
@@ -96,137 +60,17 @@ body {
   color: #fff;
 }
 
-
+.navbar-title {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #fff;
+}
 
 .back-button {
   background: none;
   border: none;
   color: #fff;
   font-size: var(--font-md);
-  cursor: pointer;
-}
-
-/* ==================================================
-   RADIX MODAL (CRITICAL FIX)
-================================================== */
-
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--bg-overlay);
-  z-index: 1000;
-}
-
-.modal {
-  position: fixed;                 /* 🔥 */
-  top: 50%;                        /* 🔥 */
-  left: 50%;                       /* 🔥 */
-  transform: translate(-50%, -50%);/* 🔥 */
-
-  z-index: 1001;
-  background: var(--bg-white);
-  border-radius: 8px;
-  width: 90%;
-  overflow: hidden;
-}
-
-
-.modal-wide {
-  display: grid;
-  grid-template-columns: 360px 1fr;
-  height: 90vh;
-  max-width: 1000px;
-}
-
-/* ==================================================
-   ACTOR DETAILS (LEFT)
-================================================== */
-
-.actor-details {
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--border-light);
-}
-
-.actor-scroll {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-lg);
-}
-
-.actor-details img {
-  max-width: 240px;
-  width: 100%;
-  border-radius: 6px;
-  margin-bottom: var(--space-md);
-}
-
-.actor-details h2 {
-  font-size: var(--font-xl);
-  margin: var(--space-md) 0;
-}
-
-.actor-details p {
-  margin: var(--space-xs) 0;
-  font-size: var(--font-md);
-}
-
-/* ==================================================
-   ACTOR MOVIES (RIGHT)
-================================================== */
-
-.actor-movies {
-  overflow-y: auto;
-  padding: var(--space-lg);
-  padding-bottom: var(--space-xl);
-}
-
-.actor-movies h3 {
-  font-size: var(--font-lg);
-  margin-bottom: var(--space-md);
-}
-
-.actor-movies ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.actor-movies li {
-  padding: var(--space-sm) 0;
-  border-bottom: 1px solid var(--border-light);
-}
-
-.movie-title {
-  font-weight: 600;
-}
-
-.movie-character {
-  font-size: var(--font-sm);
-  color: var(--text-secondary);
-}
-
-/* ==================================================
-   MODAL FOOTER
-================================================== */
-
-.modal-footer {
-  padding: var(--space-md);
-  border-top: 1px solid var(--border-light);
-  display: flex;
-  justify-content: center;
-  position: sticky;
-  bottom: 0;
-  background: var(--bg-white);
-  z-index: 1;
-}
-
-.close-button {
-  padding: 8px 28px;
-  background: #222;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
   cursor: pointer;
 }
 
@@ -243,32 +87,4 @@ body {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
-}
-
-/* ==================================================
-   MOBILE
-================================================== */
-
-@media (max-width: 768px) {
-  .modal-wide {
-    grid-template-columns: 1fr;
-    height: 100vh;
-    max-width: 100%;
-    border-radius: 0;
-  }
-
-  .actor-details {
-    border-right: none;
-    border-bottom: 1px solid var(--border-light);
-  }
-
-  .actor-scroll,
-  .actor-movies {
-    padding: var(--space-md);
-  }
-
-  .cast-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-md);
-  }
 }

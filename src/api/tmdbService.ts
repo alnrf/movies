@@ -51,6 +51,9 @@ export const getActorTv = (actorId: number) =>
     params: { language: defaultParams.language },
   });
 
+export const getActorImages = (actorId: number) =>
+  tmdbClient.get(`/person/${actorId}/images`);
+
   export const getCredits = (
   mediaType: "movie" | "tv",
   id: number

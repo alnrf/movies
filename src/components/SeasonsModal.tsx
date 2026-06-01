@@ -121,8 +121,7 @@ const SeasonsModal = ({
                     {seasonData.overview || "Sem resumo disponível."}
                   </Text>
                 </Stack>
-                <Box overflowY="auto" maxH="60vh">
-                  <Stack spacing={2}>
+                <Stack spacing={2} pb={4}>
                     {seasonData.episodes.map((episode: any) => (
                       <Box
                         key={episode.id}
@@ -173,8 +172,7 @@ const SeasonsModal = ({
                         </Stack>
                       </Box>
                     ))}
-                  </Stack>
-                </Box>
+                </Stack>
                 <Button mt={4} onClick={handleBack}>
                   Voltar
                 </Button>

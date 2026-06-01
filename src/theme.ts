@@ -1,3 +1,3 @@
-import { createSystem, defaultConfig } from "@chakra-ui/react";
+import { extendTheme } from "@chakra-ui/react";
 
-export const system = createSystem(defaultConfig);
+export const theme = extendTheme({});

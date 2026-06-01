@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { getTvShowDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
 import { getBackdropUrl } from "../utils/tmdbImage";
-import { getYearFromDate, formatDate } from "../utils/date";
+import { formatDate } from "../utils/date";
 import {
   Badge,
   Box,
@@ -13,6 +14,7 @@ import {
   Grid,
   Heading,
   Image,
+  Spinner,
   Stack,
   Text,
 } from "@chakra-ui/react";
@@ -21,32 +23,62 @@ import EpisodeDetailModal from "../components/EpisodeDetailModal";
 
 export default function TVDetailPage() {
   const { id } = useParams();
-  const [tv, setTv] = useState<any>(null);
-  const [cast, setCast] = useState<any[]>([]);
+  const navigate = useNavigate();
+  const numericId = Number(id);
+
   const [isSeasonsModalOpen, setIsSeasonsModalOpen] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
-  const [isEpisodeDetailModalOpen, setIsEpisodeDetailModalOpen] = useState(false);
+  const [isEpisodeDetailModalOpen, setIsEpisodeDetailModalOpen] =
+    useState(false);
   const [selectedEpisode, setSelectedEpisode] = useState<number | null>(null);
 
-  useEffect(() => {
-    async function fetchData() {
-      if (!id) return;
-
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["tv", numericId],
+    queryFn: async () => {
       const [detailRes, creditsRes] = await Promise.all([
-        getTvShowDetail(Number(id)),
-        getCredits("tv", Number(id)),
+        getTvShowDetail(numericId),
+        getCredits("tv", numericId),
       ]);
+      return { tv: detailRes.data, cast: creditsRes.data.cast as any[] };
+    },
+    enabled: !isNaN(numericId),
+  });
 
-      setTv(detailRes.data);
-      setCast(creditsRes.data.cast);
-    }
+  useEffect(() => {
+    if (data?.tv) document.title = `${data.tv.name} — Movies`;
+    return () => { document.title = "Movies"; };
+  }, [data?.tv]);
 
-    fetchData();
-  }, [id]);
+  if (!id || isNaN(numericId)) {
+    navigate("/404", { replace: true });
+    return null;
+  }
 
-  if (!tv) return null;
+  if (isLoading) {
+    return (
+      <Box textAlign="center" mt={20}>
+        <Spinner size="xl" />
+      </Box>
+    );
+  }
 
-  const launchYear = getYearFromDate(tv.first_air_date);
+  if (isError || !data?.tv) {
+    return (
+      <Box textAlign="center" py={20} px={6}>
+        <Heading size="lg" mb={4}>
+          Série não encontrada
+        </Heading>
+        <Text color="gray.500" mb={6}>
+          Não foi possível carregar as informações desta série.
+        </Text>
+        <Button colorScheme="teal" onClick={() => navigate("/")}>
+          Voltar para a busca
+        </Button>
+      </Box>
+    );
+  }
+
+  const { tv, cast } = data;
 
   return (
     <>
@@ -74,6 +106,7 @@ export default function TVDetailPage() {
             </Text>
           </Box>
         </Stack>
+
         <Heading as="h3" size="md" mb={3} mt={6}>
           Informações do Programa
         </Heading>
@@ -81,8 +114,8 @@ export default function TVDetailPage() {
           direction="row"
           mb={3}
           mt={3}
-          justifyContent={"space-between"}
-          alignItems={"center"}
+          justifyContent="space-between"
+          alignItems="center"
         >
           <Flex direction="row" gap={2}>
             <Text as="span" fontWeight="semibold">
@@ -109,8 +142,8 @@ export default function TVDetailPage() {
           direction="row"
           mb={3}
           mt={3}
-          justifyContent={"space-between"}
-          alignItems={"center"}
+          justifyContent="space-between"
+          alignItems="center"
         >
           <Flex direction="row" gap={2}>
             <Text as="span" fontWeight="semibold">
@@ -124,10 +157,7 @@ export default function TVDetailPage() {
             </Text>
             <Text as="span">{tv.number_of_seasons}</Text>
           </Flex>
-          <Button
-            onClick={() => setIsSeasonsModalOpen(true)}
-            colorScheme="teal"
-          >
+          <Button onClick={() => setIsSeasonsModalOpen(true)} colorScheme="teal">
             Ver Temporadas
           </Button>
         </Flex>
@@ -138,50 +168,47 @@ export default function TVDetailPage() {
           ))}
         </Stack>
         <Divider mt={3} />
+
         <Heading as="h3" size="md" mb={3} mt={6}>
           Elenco do Programa
         </Heading>
-
         <Grid
           templateColumns={{
-            base: "1fr", // mobile
-            md: "repeat(2, 1fr)", // tablet (opcional)
-            lg: "repeat(5, 1fr)", // desktop
+            base: "1fr",
+            md: "repeat(2, 1fr)",
+            lg: "repeat(5, 1fr)",
           }}
           gap={6}
           mt={4}
         >
-          {cast.map(
-            (actor) =>
-              launchYear && (
-                <CastCard
-                  key={actor.id}
-                  actor={actor}
-                />
-              ),
-          )}
+          {cast.map((actor) => (
+            <CastCard key={actor.id} actor={actor} />
+          ))}
         </Grid>
       </Box>
-      {isSeasonsModalOpen && (
-        <SeasonsModal
-          isOpen={isSeasonsModalOpen}
-          onClose={() => setIsSeasonsModalOpen(false)}
-          tvId={Number(id)}
-          seasons={tv.number_of_seasons}
-          onEpisodeSelect={(season, episode) => {
-            setSelectedSeason(season);
-            setSelectedEpisode(episode);
-            setIsEpisodeDetailModalOpen(true);
-          }}
-        />
-      )}
+
+      <SeasonsModal
+        isOpen={isSeasonsModalOpen}
+        onClose={() => setIsSeasonsModalOpen(false)}
+        tvId={numericId}
+        seasons={tv.number_of_seasons}
+        onEpisodeSelect={(season, episode) => {
+          setIsSeasonsModalOpen(false);
+          setSelectedSeason(season);
+          setSelectedEpisode(episode);
+          setIsEpisodeDetailModalOpen(true);
+        }}
+      />
       {isEpisodeDetailModalOpen && selectedSeason && selectedEpisode && (
         <EpisodeDetailModal
-          tvId={Number(id)}
+          tvId={numericId}
           seasonNumber={selectedSeason}
           episodeNumber={selectedEpisode}
           isOpen={isEpisodeDetailModalOpen}
-          onClose={() => setIsEpisodeDetailModalOpen(false)}
+          onClose={() => {
+            setIsEpisodeDetailModalOpen(false);
+            setIsSeasonsModalOpen(true);
+          }}
         />
       )}
     </>

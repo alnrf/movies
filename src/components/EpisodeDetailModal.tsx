@@ -10,7 +10,6 @@ import {
   Divider,
   Heading,
   Grid,
-  Box,
 } from "@chakra-ui/react";
 import { getTvEpisodeDetails } from "../api/tmdbService";
 import { formatDate } from "../utils/date";
@@ -52,13 +51,13 @@ const EpisodeDetailModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="6xl" scrollBehavior="inside">
       <ModalOverlay />
-      <ModalContent maxH="90vh">
+      <ModalContent>
         <ModalHeader>Detalhes do Episódio {episodeNumber}</ModalHeader>
         <ModalCloseButton />
         <ModalBody p={6}>
           {loading && <Text>Carregando...</Text>}
           {!loading && episode && (
-            <Box overflowY="auto" maxH="65vh">
+            <>
               <Text fontWeight="bold" mb={2}>
                 {episode.name}
               </Text>
@@ -76,12 +75,13 @@ const EpisodeDetailModal = ({
                 }}
                 gap={6}
                 mt={4}
+                mb={4}
               >
                 {episode.guest_stars?.map((actor: any) => (
                   <CastCard key={actor.id} actor={actor} />
                 ))}
               </Grid>
-            </Box>
+            </>
           )}
         </ModalBody>
       </ModalContent>
