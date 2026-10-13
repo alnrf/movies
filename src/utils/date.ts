@@ -21,7 +21,7 @@ export function formatDate(date?: string | null): string | null {
   return `${day}/${month}/${year}`;
 }
 
-export function calculateAgeDetailed(birthDate: string, endDate?: string): string {
+export function calculateAgeDetailed(birthDate: string, endDate?: string | null): string {
   const birth = new Date(birthDate);
   const end = endDate ? new Date(endDate) : new Date();
 

@@ -15,16 +15,16 @@ describe('saveLastSearch / getLastSearch', () => {
     saveLastSearch('Batman', 'movie');
     const result = getLastSearch();
     expect(result).not.toBeNull();
-    expect(result.query).toBe('Batman');
-    expect(result.type).toBe('movie');
+    expect(result!.query).toBe('Batman');
+    expect(result!.type).toBe('movie');
   });
 
   it('sobrescreve a busca anterior', () => {
     saveLastSearch('Batman', 'movie');
     saveLastSearch('Breaking Bad', 'tv');
     const result = getLastSearch();
-    expect(result.query).toBe('Breaking Bad');
-    expect(result.type).toBe('tv');
+    expect(result!.query).toBe('Breaking Bad');
+    expect(result!.type).toBe('tv');
   });
 
   it('retorna null quando não há busca salva', () => {
@@ -34,8 +34,8 @@ describe('saveLastSearch / getLastSearch', () => {
   it('persiste a data junto com a busca', () => {
     saveLastSearch('Batman', 'movie');
     const result = getLastSearch();
-    expect(result.date).toBeDefined();
-    expect(new Date(result.date).toString()).not.toBe('Invalid Date');
+    expect(result!.date).toBeDefined();
+    expect(new Date(result!.date).toString()).not.toBe('Invalid Date');
   });
 });
 

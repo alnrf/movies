@@ -13,7 +13,7 @@ export default function Navbar() {
           className="navbar-title"
           onClick={canGoBack ? () => navigate("/") : undefined}
           aria-label="Home"
-          style={canGoBack ? { cursor: "pointer" } : { cursor: "none" }}
+          style={canGoBack ? { cursor: "pointer" } : { cursor: "default" }}
         >
           MovieSearch
         </h1>

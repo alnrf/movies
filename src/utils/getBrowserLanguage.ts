@@ -14,3 +14,8 @@ export function getBrowserLanguage(): string {
   // fallback se vier só "en"
   return `${lang.toLowerCase()}-${lang.toUpperCase()}`;
 }
+
+export function getBrowserRegion(): string {
+  const [, region] = getBrowserLanguage().split("-");
+  return region || "BR";
+}

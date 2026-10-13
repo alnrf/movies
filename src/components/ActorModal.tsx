@@ -36,6 +36,7 @@ import {
 } from "@chakra-ui/icons";
 import { getYearFromDate, formatDate, calculateAgeDetailed } from "../utils/date";
 import { useSortByDate } from "../hooks/useSortByDate";
+import type { Person, PersonMovieCredit, PersonTvCredit, PersonImage } from "../types/Person";
 
 interface Props {
   actorId: number;
@@ -45,10 +46,10 @@ interface Props {
 
 export default function ActorModal({ actorId, open, onClose }: Props) {
   const navigate = useNavigate();
-  const [actor, setActor] = useState<any>(null);
-  const [movies, setMovies] = useState<any[]>([]);
-  const [tv, setTv] = useState<any[]>([]);
-  const [photos, setPhotos] = useState<any[]>([]);
+  const [actor, setActor] = useState<Person | null>(null);
+  const [movies, setMovies] = useState<PersonMovieCredit[]>([]);
+  const [tv, setTv] = useState<PersonTvCredit[]>([]);
+  const [photos, setPhotos] = useState<PersonImage[]>([]);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -267,9 +268,6 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                             const year = t.first_air_date
                               ? new Date(t.first_air_date).getFullYear()
                               : "—";
-                            const creditYear = t.first_credit_air_date
-                              ? new Date(t.first_credit_air_date).getFullYear()
-                              : "—";
 
                             return (
                               <Box key={t.id}>
@@ -304,8 +302,8 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                                 <Flex direction="row" align="center" gap={2}>
                                   <Text fontSize="sm" color="gray.600">
                                     Idade:{" "}
-                                    {creditYear && birthYear && typeof creditYear === "number" && typeof birthYear === "number"
-                                      ? creditYear - birthYear
+                                    {birthYear && typeof year === "number"
+                                      ? year - birthYear
                                       : "—"}{" "}
                                     anos
                                   </Text>
@@ -390,7 +388,7 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                               flex="1"
                               onScroll={updateScrollState}
                             >
-                              {photos.map((photo: any) => (
+                              {photos.map((photo) => (
                                 <Image
                                   key={photo.file_path}
                                   src={getProfileUrl(photo.file_path, "SMALL")}

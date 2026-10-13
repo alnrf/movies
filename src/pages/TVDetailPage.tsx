@@ -5,6 +5,9 @@ import { getTvShowDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
 import { getBackdropUrl } from "../utils/tmdbImage";
 import { formatDate } from "../utils/date";
+import WatchProviders from "../components/WatchProviders";
+import type { TvShowDetail } from "../types/TvShow";
+import type { CastMember } from "../types/Cast";
 import {
   Badge,
   Box,
@@ -39,7 +42,10 @@ export default function TVDetailPage() {
         getTvShowDetail(numericId),
         getCredits("tv", numericId),
       ]);
-      return { tv: detailRes.data, cast: creditsRes.data.cast as any[] };
+      return {
+        tv: detailRes.data as TvShowDetail,
+        cast: creditsRes.data.cast as CastMember[],
+      };
     },
     enabled: !isNaN(numericId),
   });
@@ -82,7 +88,7 @@ export default function TVDetailPage() {
 
   return (
     <>
-      <Box maxW="1000px" mx="auto" p={4}>
+      <Box maxW="1200px" mx="auto" p={4}>
         <Stack
           direction={{ base: "column", md: "row" }}
           spacing={6}
@@ -107,66 +113,75 @@ export default function TVDetailPage() {
           </Box>
         </Stack>
 
-        <Heading as="h3" size="md" mb={3} mt={6}>
-          Informações do Programa
-        </Heading>
-        <Flex
-          direction="row"
-          mb={3}
-          mt={3}
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Flex direction="row" gap={2}>
-            <Text as="span" fontWeight="semibold">
-              Primeiro Episódio:
-            </Text>
-            <Text as="span">{formatDate(tv.first_air_date) || "—"}</Text>
-          </Flex>
-          <Flex direction="row" gap={2}>
-            <Text as="span" fontWeight="semibold">
-              Último Episódio:
-            </Text>
-            <Text as="span">{formatDate(tv.last_air_date) || "—"}</Text>
-          </Flex>
-          <Flex direction="row" gap={2}>
-            <Text as="span" fontWeight="semibold">
-              Próximo Episódio:
-            </Text>
-            <Text as="span">
-              {formatDate(tv.next_episode_to_air?.air_date) || "—"}
-            </Text>
-          </Flex>
-        </Flex>
-        <Flex
-          direction="row"
-          mb={3}
-          mt={3}
-          justifyContent="space-between"
-          alignItems="center"
-        >
-          <Flex direction="row" gap={2}>
-            <Text as="span" fontWeight="semibold">
-              Número de Episódios:
-            </Text>
-            <Text as="span">{tv.number_of_episodes}</Text>
-          </Flex>
-          <Flex direction="row" gap={2}>
-            <Text as="span" fontWeight="semibold">
-              Número de Temporadas:
-            </Text>
-            <Text as="span">{tv.number_of_seasons}</Text>
-          </Flex>
-          <Button onClick={() => setIsSeasonsModalOpen(true)} colorScheme="teal">
-            Ver Temporadas
-          </Button>
-        </Flex>
+        <Stack direction={{ base: "column", lg: "row" }} spacing={8} align="flex-start" mt={6}>
+          <Box flex="1" minW={0}>
+            <Heading as="h3" size="md" mb={3}>
+              Informações do Programa
+            </Heading>
+            <Flex
+              direction="row"
+              mb={3}
+              mt={3}
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Flex direction="row" gap={2}>
+                <Text as="span" fontWeight="semibold">
+                  Primeiro Episódio:
+                </Text>
+                <Text as="span">{formatDate(tv.first_air_date) || "—"}</Text>
+              </Flex>
+              <Flex direction="row" gap={2}>
+                <Text as="span" fontWeight="semibold">
+                  Último Episódio:
+                </Text>
+                <Text as="span">{formatDate(tv.last_air_date) || "—"}</Text>
+              </Flex>
+              <Flex direction="row" gap={2}>
+                <Text as="span" fontWeight="semibold">
+                  Próximo Episódio:
+                </Text>
+                <Text as="span">
+                  {formatDate(tv.next_episode_to_air?.air_date) || "—"}
+                </Text>
+              </Flex>
+            </Flex>
+            <Flex
+              direction="row"
+              mb={3}
+              mt={3}
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Flex direction="row" gap={2}>
+                <Text as="span" fontWeight="semibold">
+                  Número de Episódios:
+                </Text>
+                <Text as="span">{tv.number_of_episodes}</Text>
+              </Flex>
+              <Flex direction="row" gap={2}>
+                <Text as="span" fontWeight="semibold">
+                  Número de Temporadas:
+                </Text>
+                <Text as="span">{tv.number_of_seasons}</Text>
+              </Flex>
+              <Button onClick={() => setIsSeasonsModalOpen(true)} colorScheme="teal">
+                Ver Temporadas
+              </Button>
+            </Flex>
 
-        <Stack direction="row" mb={3} mt={3} spacing={2}>
-          {tv.genres.map((genre: any) => (
-            <Badge key={genre.id}>{genre.name}</Badge>
-          ))}
+            <Stack direction="row" mb={3} mt={3} spacing={2}>
+              {tv.genres.map((genre) => (
+                <Badge key={genre.id}>{genre.name}</Badge>
+              ))}
+            </Stack>
+          </Box>
+
+          <Box w={{ base: "100%", lg: "360px" }} flexShrink={0}>
+            <WatchProviders mediaType="tv" id={tv.id} />
+          </Box>
         </Stack>
+
         <Divider mt={3} />
 
         <Heading as="h3" size="md" mb={3} mt={6}>

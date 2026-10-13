@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Modal,
   ModalBody,
@@ -18,6 +19,7 @@ import {
 import { getTvSeasonDetails } from "../api/tmdbService";
 import { getBackdropUrl } from "../utils/tmdbImage";
 import { formatDate } from "../utils/date";
+import type { SeasonDetail } from "../types/TvShow";
 
 interface SeasonsModalProps {
   isOpen: boolean;
@@ -35,24 +37,15 @@ const SeasonsModal = ({
   onEpisodeSelect,
 }: SeasonsModalProps) => {
   const [selectedSeason, setSelectedSeason] = useState<number | null>(null);
-  const [seasonData, setSeasonData] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    if (selectedSeason) {
-      setLoading(true);
-      getTvSeasonDetails(tvId, selectedSeason)
-        .then((res) => {
-          setSeasonData(res.data);
-          setLoading(false);
-        })
-        .catch(() => {
-          setLoading(false);
-        });
-    } else {
-      setSeasonData(null);
-    }
-  }, [selectedSeason, tvId]);
+  const { data: seasonData, isLoading: loading } = useQuery({
+    queryKey: ["tvSeason", tvId, selectedSeason],
+    queryFn: () =>
+      getTvSeasonDetails(tvId, selectedSeason!).then(
+        (res) => res.data as SeasonDetail,
+      ),
+    enabled: selectedSeason !== null,
+  });
 
   const handleSeasonClick = (season: number) => {
     setSelectedSeason(season);
@@ -122,7 +115,7 @@ const SeasonsModal = ({
                   </Text>
                 </Stack>
                 <Stack spacing={2} pb={4}>
-                    {seasonData.episodes.map((episode: any) => (
+                    {seasonData.episodes.map((episode) => (
                       <Box
                         key={episode.id}
                         p={2}

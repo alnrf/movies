@@ -3,13 +3,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getMovieDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
-import { format } from "date-fns";
+import { formatDate } from "../utils/date";
 import { getBackdropUrl } from "../utils/tmdbImage";
-import { Grid } from "@chakra-ui/react/grid";
+import WatchProviders from "../components/WatchProviders";
+import type { MovieDetail } from "../types/Movie";
+import type { CastMember } from "../types/Cast";
 import {
   Badge,
   Box,
   Button,
+  Grid,
   Heading,
   Image,
   Spinner,
@@ -29,7 +32,10 @@ export default function MovieDetailPage() {
         getMovieDetail(numericId),
         getCredits("movie", numericId),
       ]);
-      return { movie: detail.data, cast: credits.data.cast as any[] };
+      return {
+        movie: detail.data as MovieDetail,
+        cast: credits.data.cast as CastMember[],
+      };
     },
     enabled: !isNaN(numericId),
   });
@@ -70,10 +76,10 @@ export default function MovieDetailPage() {
 
   const { movie, cast } = data;
 
-  const currency = { style: "currency", currency: "BRL" };
+  const currency: Intl.NumberFormatOptions = { style: "currency", currency: "BRL" };
 
   return (
-    <Box maxW="1000px" mx="auto" p={4}>
+    <Box maxW="1200px" mx="auto" p={4}>
       <Stack
         direction={{ base: "column", md: "row" }}
         spacing={6}
@@ -97,37 +103,45 @@ export default function MovieDetailPage() {
         </Box>
       </Stack>
 
-      <Heading as="h3" size="md" mb={3} mt={6}>
-        Informações do Filme
-      </Heading>
-      <Text>
-        <Text as="span" fontWeight="semibold">
-          Lançamento:
-        </Text>{" "}
-        {format(movie.release_date, "dd/MM/yyyy")}
-      </Text>
-      <Text>
-        <Text as="span" fontWeight="semibold">
-          Título original:
-        </Text>{" "}
-        {movie.original_title}
-      </Text>
-      <Text>
-        <Text as="span" fontWeight="semibold">
-          Orçamento:
-        </Text>{" "}
-        {movie.budget.toLocaleString("pt-BR", currency)}
-      </Text>
-      <Text>
-        <Text as="span" fontWeight="semibold">
-          Faturamento:
-        </Text>{" "}
-        {movie.revenue.toLocaleString("pt-BR", currency)}
-      </Text>
-      <Stack direction="row" mb={3} mt={3} spacing={2}>
-        {movie.genres.map((genre: any) => (
-          <Badge key={genre.id}>{genre.name}</Badge>
-        ))}
+      <Stack direction={{ base: "column", lg: "row" }} spacing={8} align="flex-start" mt={6}>
+        <Box flex="1" minW={0}>
+          <Heading as="h3" size="md" mb={3}>
+            Informações do Filme
+          </Heading>
+          <Text>
+            <Text as="span" fontWeight="semibold">
+              Lançamento:
+            </Text>{" "}
+            {formatDate(movie.release_date) || "—"}
+          </Text>
+          <Text>
+            <Text as="span" fontWeight="semibold">
+              Título original:
+            </Text>{" "}
+            {movie.original_title}
+          </Text>
+          <Text>
+            <Text as="span" fontWeight="semibold">
+              Orçamento:
+            </Text>{" "}
+            {movie.budget.toLocaleString("pt-BR", currency)}
+          </Text>
+          <Text>
+            <Text as="span" fontWeight="semibold">
+              Faturamento:
+            </Text>{" "}
+            {movie.revenue.toLocaleString("pt-BR", currency)}
+          </Text>
+          <Stack direction="row" mb={3} mt={3} spacing={2}>
+            {movie.genres.map((genre) => (
+              <Badge key={genre.id}>{genre.name}</Badge>
+            ))}
+          </Stack>
+        </Box>
+
+        <Box w={{ base: "100%", lg: "600px" }} flexShrink={0}>
+          <WatchProviders mediaType="movie" id={movie.id} />
+        </Box>
       </Stack>
 
       <Heading as="h3" size="md" mb={3} mt={6}>

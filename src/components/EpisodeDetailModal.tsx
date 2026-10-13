@@ -14,6 +14,7 @@ import {
 import { getTvEpisodeDetails } from "../api/tmdbService";
 import { formatDate } from "../utils/date";
 import CastCard from "./CastCard";
+import type { EpisodeDetail } from "../types/TvShow";
 
 interface EpisodeDetailModalProps {
   tvId: number;
@@ -30,7 +31,7 @@ const EpisodeDetailModal = ({
   isOpen,
   onClose,
 }: EpisodeDetailModalProps) => {
-  const [episode, setEpisode] = useState<any>(null);
+  const [episode, setEpisode] = useState<EpisodeDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -77,7 +78,7 @@ const EpisodeDetailModal = ({
                 mt={4}
                 mb={4}
               >
-                {episode.guest_stars?.map((actor: any) => (
+                {episode.guest_stars?.map((actor) => (
                   <CastCard key={actor.id} actor={actor} />
                 ))}
               </Grid>

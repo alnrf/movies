@@ -1,21 +1,43 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import ActorModal from "./ActorModal";
-import { Card, CardBody, CardFooter } from "@chakra-ui/react/card";
-import { Stack } from "@chakra-ui/react/stack";
-import { Image } from "@chakra-ui/react/image";
-import { Heading } from "@chakra-ui/react/typography";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  Heading,
+  Image,
+  Stack,
+} from "@chakra-ui/react";
 import { getPosterUrl } from "../utils/tmdbImage";
-import { Button } from "@chakra-ui/react/button";
+import type { SearchResultItem } from "../types/SearchResult";
+import type { SearchType } from "../types/SearchType";
 
-export default function SearchResults({ results, type }: any) {
+interface Props {
+  results: SearchResultItem[];
+  type: SearchType;
+}
+
+export default function SearchResults({ results, type }: Props) {
   const navigate = useNavigate();
   const [selectedActor, setSelectedActor] = useState<number | null>(null);
 
   return (
     <>
       <>
-        {results.map((item: any) => (
+        {results.map((item) => {
+          const posterPath =
+            "poster_path" in item ? item.poster_path : item.profile_path;
+          const title =
+            "original_title" in item
+              ? item.original_title
+              : "original_name" in item
+                ? item.original_name
+                : item.name;
+          const displayName = "title" in item ? item.title : item.name;
+
+          return (
           <Card
             key={item.id}
             direction={{ base: "column", sm: "row" }}
@@ -24,16 +46,13 @@ export default function SearchResults({ results, type }: any) {
             marginTop="2"
           >
             <Image
-              src={getPosterUrl(
-                item.poster_path || item.profile_path,
-                "XSMALL",
-              )}
-              alt={item.original_title || item.original_name || item?.name}
+              src={getPosterUrl(posterPath, "XSMALL")}
+              alt={title}
               objectFit="cover"
             />
             <Stack>
               <CardBody>
-                <Heading size="md">{item.title || item.name}</Heading>
+                <Heading size="md">{displayName}</Heading>
               </CardBody>
               <CardFooter>
                 <Button
@@ -52,7 +71,8 @@ export default function SearchResults({ results, type }: any) {
               </CardFooter>
             </Stack>
           </Card>
-        ))}
+          );
+        })}
       </>
 
       {selectedActor !== null && (

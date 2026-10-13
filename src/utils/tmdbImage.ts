@@ -19,6 +19,12 @@ export function getProfileUrl(
   return `${TMDB_CONFIG.IMAGE_BASE_URL}/${TMDB_CONFIG.POSTER_SIZES[size]}${path}`;
 }
 
+export function getProviderLogoUrl(path: string | null) {
+  if (!path) return unknownImage;
+
+  return `${TMDB_CONFIG.IMAGE_BASE_URL}/w92${path}`;
+}
+
 export function getBackdropUrl(
   path: string | null,
   size: keyof typeof TMDB_CONFIG.BACKDROP_SIZES = "LARGE"

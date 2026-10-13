@@ -1,9 +1,7 @@
 import axios from "axios";
+import { TMDB_CONFIG } from "../config/tmdb";
 
 export const tmdbClient = axios.create({
-  baseURL: "https://api.themoviedb.org/3",
-  headers: {
-    accept: "application/json",
-    Authorization: `Bearer ${import.meta.env.VITE_TMDB_BEARER_TOKEN}`,
-  },
+  baseURL: TMDB_CONFIG.BASE_URL,
+  headers: TMDB_CONFIG.HEADERS,
 });

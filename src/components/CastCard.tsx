@@ -1,11 +1,11 @@
 import { useState } from "react";
 import ActorModal from "./ActorModal";
 import { getProfileUrl } from "../utils/tmdbImage";
-import { Card, CardBody } from "@chakra-ui/react/card";
-import { Heading, Image, Stack, Text } from "@chakra-ui/react";
+import { Card, CardBody, Heading, Image, Stack, Text } from "@chakra-ui/react";
+import type { CastMember } from "../types/Cast";
 
 interface Props {
-  actor: any;
+  actor: CastMember;
 }
 
 export default function CastCard({ actor }: Props) {

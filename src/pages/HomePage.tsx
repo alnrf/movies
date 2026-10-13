@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import {
   addToSearchHistory,
   getLastSearch,
   getSearchHistory,
   saveLastSearch,
+  type SearchHistoryItem,
 } from "../utils/searchStorage";
 import type { SearchType } from "../types/SearchType";
+import type { SearchResultItem } from "../types/SearchResult";
 import { getMovies, getTvShows, getPeople } from "../api/tmdbService";
 import SearchForm from "../components/SearchForm";
 import SearchResults from "../components/SearchResults";
@@ -25,30 +28,26 @@ async function fetchSearchResults({ query, type, page }: SearchParams) {
     if (type === "tv") response = await getTvShows(query, page);
     if (type === "person") response = await getPeople(query, page);
     return {
-      results: response?.data?.results ?? [],
+      results: (response?.data?.results ?? []) as SearchResultItem[],
       totalPages: response?.data?.total_pages ?? 1,
     };
-  } catch (err: any) {
-    const status = err?.response?.status;
+  } catch (err) {
+    const status = axios.isAxiosError(err) ? err.response?.status : undefined;
     if (status === 400 || status === 404) return { results: [], totalPages: 1 };
     throw err;
   }
 }
 
 export default function HomePage() {
-  const [inputQuery, setInputQuery] = useState("");
-  const [inputType, setInputType] = useState<SearchType>("movie");
+  const [inputQuery, setInputQuery] = useState(() => getLastSearch()?.query ?? "");
+  const [inputType, setInputType] = useState<SearchType>(
+    () => getLastSearch()?.type ?? "movie",
+  );
   const [searchParams, setSearchParams] = useState<SearchParams | null>(null);
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<SearchHistoryItem[]>(() => getSearchHistory());
 
   useEffect(() => {
     document.title = "Movies";
-    const last = getLastSearch();
-    if (last) {
-      setInputQuery(last.query);
-      setInputType(last.type);
-    }
-    setHistory(getSearchHistory());
   }, []);
 
   const { data, isLoading, isError } = useQuery({
