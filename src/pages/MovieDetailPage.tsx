@@ -5,6 +5,7 @@ import { getMovieDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
 import { formatDate } from "../utils/date";
 import { getBackdropUrl } from "../utils/tmdbImage";
+import { formatMoney } from "../utils/currency";
 import WatchProviders from "../components/WatchProviders";
 import type { MovieDetail } from "../types/Movie";
 import type { CastMember } from "../types/Cast";
@@ -76,8 +77,6 @@ export default function MovieDetailPage() {
 
   const { movie, cast } = data;
 
-  const currency: Intl.NumberFormatOptions = { style: "currency", currency: "BRL" };
-
   return (
     <Box maxW="1200px" mx="auto" p={4}>
       <Stack
@@ -124,13 +123,13 @@ export default function MovieDetailPage() {
             <Text as="span" fontWeight="semibold">
               Orçamento:
             </Text>{" "}
-            {movie.budget.toLocaleString("pt-BR", currency)}
+            {formatMoney(movie.budget)}
           </Text>
           <Text>
             <Text as="span" fontWeight="semibold">
               Faturamento:
             </Text>{" "}
-            {movie.revenue.toLocaleString("pt-BR", currency)}
+            {formatMoney(movie.revenue)}
           </Text>
           <Stack direction="row" mb={3} mt={3} spacing={2}>
             {movie.genres.map((genre) => (

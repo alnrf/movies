@@ -17,6 +17,7 @@ import {
   Grid,
   Heading,
   Image,
+  SimpleGrid,
   Spinner,
   Stack,
   Text,
@@ -118,57 +119,45 @@ export default function TVDetailPage() {
             <Heading as="h3" size="md" mb={3}>
               Informações do Programa
             </Heading>
-            <Flex
-              direction="row"
+            <SimpleGrid
+              columns={{ base: 2, md: 3 }}
+              spacingX={4}
+              spacingY={3}
               mb={3}
               mt={3}
-              justifyContent="space-between"
               alignItems="center"
             >
-              <Flex direction="row" gap={2}>
-                <Text as="span" fontWeight="semibold">
-                  Primeiro Episódio:
-                </Text>
-                <Text as="span">{formatDate(tv.first_air_date) || "—"}</Text>
-              </Flex>
-              <Flex direction="row" gap={2}>
-                <Text as="span" fontWeight="semibold">
-                  Último Episódio:
-                </Text>
-                <Text as="span">{formatDate(tv.last_air_date) || "—"}</Text>
-              </Flex>
-              <Flex direction="row" gap={2}>
-                <Text as="span" fontWeight="semibold">
-                  Próximo Episódio:
-                </Text>
-                <Text as="span">
-                  {formatDate(tv.next_episode_to_air?.air_date) || "—"}
-                </Text>
-              </Flex>
-            </Flex>
-            <Flex
-              direction="row"
-              mb={3}
-              mt={3}
-              justifyContent="space-between"
-              alignItems="center"
-            >
-              <Flex direction="row" gap={2}>
-                <Text as="span" fontWeight="semibold">
-                  Número de Episódios:
-                </Text>
-                <Text as="span">{tv.number_of_episodes}</Text>
-              </Flex>
-              <Flex direction="row" gap={2}>
-                <Text as="span" fontWeight="semibold">
-                  Número de Temporadas:
-                </Text>
-                <Text as="span">{tv.number_of_seasons}</Text>
-              </Flex>
-              <Button onClick={() => setIsSeasonsModalOpen(true)} colorScheme="teal">
+              {[
+                { label: "Primeiro Episódio:", value: formatDate(tv.first_air_date) || "—" },
+                { label: "Último Episódio:", value: formatDate(tv.last_air_date) || "—" },
+                {
+                  label: "Próximo Episódio:",
+                  value: formatDate(tv.next_episode_to_air?.air_date) || "—",
+                },
+                { label: "Número de Episódios:", value: tv.number_of_episodes },
+                { label: "Número de Temporadas:", value: tv.number_of_seasons },
+              ].map(({ label, value }) => (
+                <Flex
+                  key={label}
+                  direction={{ base: "column", md: "row" }}
+                  gap={{ base: 0, md: 2 }}
+                >
+                  <Text as="span" fontWeight="semibold">
+                    {label}
+                  </Text>
+                  <Text as="span">{value}</Text>
+                </Flex>
+              ))}
+              <Button
+                onClick={() => setIsSeasonsModalOpen(true)}
+                colorScheme="teal"
+                gridColumn={{ base: "1 / -1", md: "auto" }}
+                w={{ base: "100%", md: "auto" }}
+                justifySelf={{ md: "start" }}
+              >
                 Ver Temporadas
               </Button>
-            </Flex>
+            </SimpleGrid>
 
             <Stack direction="row" mb={3} mt={3} spacing={2}>
               {tv.genres.map((genre) => (

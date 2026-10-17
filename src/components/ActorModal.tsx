@@ -112,7 +112,9 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
     ? calculateAgeDetailed(actor.birthday, actor?.deathday)
     : "—";
 
-  const sortedMovies = useSortByDate(movies, "release_date");
+  const sortedMovies = useSortByDate(movies, "release_date").filter(
+    (t) => !t.character?.toLowerCase().startsWith("self"),
+  );
   const sortedTv = useSortByDate(tv, "first_air_date").filter(
     (t) => !t.character?.toLowerCase().startsWith("self"),
   );
