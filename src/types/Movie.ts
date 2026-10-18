@@ -18,3 +18,15 @@ export interface MovieDetail {
   revenue: number;
   genres: Genre[];
 }
+
+/** Item das listas de filmes do TMDB (populares, em breve...). */
+export interface MovieListItem {
+  id: number;
+  title: string;
+  original_title: string;
+  overview: string;
+  poster_path: string | null;
+  backdrop_path: string | null;
+  release_date: string | null;
+  vote_average: number;
+}

@@ -21,6 +21,17 @@ export const getPeople = (query: string, page = 1) =>
     params: { query, ...defaultParams, page },
   });
 
+/* LISTS */
+export const getPopular = (type: "movie" | "tv" | "person", page = 1) =>
+  tmdbClient.get(`/${type}/popular`, {
+    params: { language: defaultParams.language, page },
+  });
+
+export const getUpcomingMovies = (page = 1) =>
+  tmdbClient.get("/movie/upcoming", {
+    params: { language: defaultParams.language, page },
+  });
+
 /* DETAILS */
 export const getMovieDetail = (id: number) =>
   tmdbClient.get(`/movie/${id}`, { params: { language: defaultParams.language } });

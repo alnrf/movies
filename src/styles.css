@@ -34,47 +34,6 @@ body {
 }
 
 /* ==================================================
-   LAYOUT
-================================================== */
-
-.container {
-  max-width: 1000px;
-  margin: auto;
-  padding: var(--space-lg);
-}
-
-/* ==================================================
-   NAVBAR
-================================================== */
-
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1200;
-  height: 56px;
-  padding: 0 var(--space-lg);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #2b2bd6;
-  color: #fff;
-}
-
-.navbar-title {
-  margin: 0;
-  font-size: 1.2rem;
-  color: #fff;
-}
-
-.back-button {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: var(--font-md);
-  cursor: pointer;
-}
-
-/* ==================================================
    ACCESSIBILITY
 ================================================== */
 

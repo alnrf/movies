@@ -27,7 +27,7 @@ describe('SearchForm', () => {
     renderForm();
     expect(screen.getByPlaceholderText('Pesquisar...')).toBeInTheDocument();
     expect(screen.getByLabelText('Filmes')).toBeInTheDocument();
-    expect(screen.getByLabelText('Seriados')).toBeInTheDocument();
+    expect(screen.getByLabelText('Séries')).toBeInTheDocument();
     expect(screen.getByLabelText('Atores')).toBeInTheDocument();
   });
 

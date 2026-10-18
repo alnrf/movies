@@ -1,80 +1,52 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import {
-  saveLastSearch,
-  getLastSearch,
-  addToSearchHistory,
-  getSearchHistory,
-} from '../searchStorage';
+import { addRecentItem, getRecentItems } from '../searchStorage';
 
 beforeEach(() => {
   localStorage.clear();
 });
 
-describe('saveLastSearch / getLastSearch', () => {
-  it('salva e recupera a última busca', () => {
-    saveLastSearch('Batman', 'movie');
-    const result = getLastSearch();
-    expect(result).not.toBeNull();
-    expect(result!.query).toBe('Batman');
-    expect(result!.type).toBe('movie');
+const batman = { id: 1, type: 'movie' as const, name: 'Batman', imagePath: '/b.jpg' };
+
+describe('addRecentItem / getRecentItems', () => {
+  it('adiciona item com data', () => {
+    addRecentItem(batman);
+    const items = getRecentItems();
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject(batman);
+    expect(new Date(items[0].date).toString()).not.toBe('Invalid Date');
   });
 
-  it('sobrescreve a busca anterior', () => {
-    saveLastSearch('Batman', 'movie');
-    saveLastSearch('Breaking Bad', 'tv');
-    const result = getLastSearch();
-    expect(result!.query).toBe('Breaking Bad');
-    expect(result!.type).toBe('tv');
+  it('insere o mais recente no início', () => {
+    addRecentItem(batman);
+    addRecentItem({ ...batman, id: 2, name: 'Superman' });
+    const items = getRecentItems();
+    expect(items[0].name).toBe('Superman');
+    expect(items[1].name).toBe('Batman');
   });
 
-  it('retorna null quando não há busca salva', () => {
-    expect(getLastSearch()).toBeNull();
+  it('não duplica o mesmo id+tipo e move para o topo', () => {
+    addRecentItem(batman);
+    addRecentItem({ ...batman, id: 2, name: 'Superman' });
+    addRecentItem(batman);
+    const items = getRecentItems();
+    expect(items).toHaveLength(2);
+    expect(items[0].name).toBe('Batman');
   });
 
-  it('persiste a data junto com a busca', () => {
-    saveLastSearch('Batman', 'movie');
-    const result = getLastSearch();
-    expect(result!.date).toBeDefined();
-    expect(new Date(result!.date).toString()).not.toBe('Invalid Date');
-  });
-});
-
-describe('addToSearchHistory / getSearchHistory', () => {
-  it('adiciona item ao histórico', () => {
-    addToSearchHistory('Batman', 'movie');
-    const history = getSearchHistory();
-    expect(history).toHaveLength(1);
-    expect(history[0].query).toBe('Batman');
+  it('permite mesmo id com tipo diferente', () => {
+    addRecentItem(batman);
+    addRecentItem({ ...batman, type: 'tv' });
+    expect(getRecentItems()).toHaveLength(2);
   });
 
-  it('insere mais recente no início', () => {
-    addToSearchHistory('Batman', 'movie');
-    addToSearchHistory('Superman', 'movie');
-    const history = getSearchHistory();
-    expect(history[0].query).toBe('Superman');
-    expect(history[1].query).toBe('Batman');
+  it('limita a 10 itens', () => {
+    for (let i = 1; i <= 12; i++) addRecentItem({ ...batman, id: i });
+    expect(getRecentItems()).toHaveLength(10);
   });
 
-  it('não duplica a mesma query+type', () => {
-    addToSearchHistory('Batman', 'movie');
-    addToSearchHistory('Batman', 'movie');
-    expect(getSearchHistory()).toHaveLength(1);
-  });
-
-  it('permite mesma query com tipo diferente', () => {
-    addToSearchHistory('Batman', 'movie');
-    addToSearchHistory('Batman', 'tv');
-    expect(getSearchHistory()).toHaveLength(2);
-  });
-
-  it('limita o histórico a 5 itens', () => {
-    for (let i = 1; i <= 6; i++) {
-      addToSearchHistory(`Busca ${i}`, 'movie');
-    }
-    expect(getSearchHistory()).toHaveLength(5);
-  });
-
-  it('retorna array vazio quando não há histórico', () => {
-    expect(getSearchHistory()).toEqual([]);
+  it('retorna array vazio sem dados ou com JSON inválido', () => {
+    expect(getRecentItems()).toEqual([]);
+    localStorage.setItem('recent_items', '{quebrado');
+    expect(getRecentItems()).toEqual([]);
   });
 });

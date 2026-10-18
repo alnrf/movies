@@ -11,15 +11,18 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { getPosterUrl } from "../utils/tmdbImage";
+import { addRecentItem } from "../utils/searchStorage";
 import type { SearchResultItem } from "../types/SearchResult";
 import type { SearchType } from "../types/SearchType";
 
 interface Props {
   results: SearchResultItem[];
   type: SearchType;
+  /** Quando verdadeiro, o item aberto entra em "Buscas recentes". */
+  recordRecent?: boolean;
 }
 
-export default function SearchResults({ results, type }: Props) {
+export default function SearchResults({ results, type, recordRecent = false }: Props) {
   const navigate = useNavigate();
   const [selectedActor, setSelectedActor] = useState<number | null>(null);
 
@@ -59,6 +62,9 @@ export default function SearchResults({ results, type }: Props) {
                   variant="solid"
                   colorScheme="blue"
                   onClick={() => {
+                    if (recordRecent) {
+                      addRecentItem({ id: item.id, type, name: displayName, imagePath: posterPath });
+                    }
                     if (type === "person") {
                       setSelectedActor(item.id);
                     } else {

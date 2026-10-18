@@ -1,154 +1,108 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import {
-  addToSearchHistory,
-  getSearchHistory,
-  type SearchHistoryItem,
-} from "../utils/searchStorage";
-import type { SearchType } from "../types/SearchType";
-import type { SearchResultItem } from "../types/SearchResult";
-import { getMovies, getTvShows, getPeople } from "../api/tmdbService";
-import SearchForm from "../components/SearchForm";
-import SearchResults from "../components/SearchResults";
-import { Box, Button, HStack, Spinner, Stack, Text } from "@chakra-ui/react";
+import { Box, Heading, Skeleton, Stack, Text } from "@chakra-ui/react";
+import { getPopular, getUpcomingMovies } from "../api/tmdbService";
+import { getRecentItems, type RecentItem } from "../utils/searchStorage";
+import { getPosterUrl } from "../utils/tmdbImage";
+import HeroCarousel from "../components/HeroCarousel";
+import PosterCarousel from "../components/PosterCarousel";
+import ActorModal from "../components/ActorModal";
+import type { MovieListItem } from "../types/Movie";
 
-interface SearchParams {
-  query: string;
-  type: SearchType;
-  page: number;
+const HERO_LIMIT = 10;
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <Box as="section" mt={10}>
+      <Heading as="h2" size="md" mb={4}>
+        {title}
+      </Heading>
+      {children}
+    </Box>
+  );
 }
 
-async function fetchSearchResults({ query, type, page }: SearchParams) {
-  try {
-    let response;
-    if (type === "movie") response = await getMovies(query, page);
-    if (type === "tv") response = await getTvShows(query, page);
-    if (type === "person") response = await getPeople(query, page);
-    return {
-      results: (response?.data?.results ?? []) as SearchResultItem[],
-      totalPages: response?.data?.total_pages ?? 1,
-    };
-  } catch (err) {
-    const status = axios.isAxiosError(err) ? err.response?.status : undefined;
-    if (status === 400 || status === 404) return { results: [], totalPages: 1 };
-    throw err;
-  }
+function ErrorText() {
+  return <Text color="red.500">Não foi possível carregar. Tente novamente mais tarde.</Text>;
 }
 
 export default function HomePage() {
-  const [inputQuery, setInputQuery] = useState("");
-  const [inputType, setInputType] = useState<SearchType>("movie");
-  const [searchParams, setSearchParams] = useState<SearchParams | null>(null);
-  const [history, setHistory] = useState<SearchHistoryItem[]>(() => getSearchHistory());
+  const navigate = useNavigate();
+  const [recentItems] = useState<RecentItem[]>(() => getRecentItems());
+  const [selectedActor, setSelectedActor] = useState<number | null>(null);
 
   useEffect(() => {
     document.title = "Movies";
   }, []);
 
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["search", searchParams?.query, searchParams?.type, searchParams?.page],
-    queryFn: () => fetchSearchResults(searchParams!),
-    enabled: !!searchParams,
+  const popular = useQuery({
+    queryKey: ["movies", "popular"],
+    queryFn: async () => (await getPopular("movie")).data.results as MovieListItem[],
   });
 
-  const results = data?.results ?? [];
-  const totalPages = data?.totalPages ?? 1;
-  const currentPage = searchParams?.page ?? 1;
+  const upcoming = useQuery({
+    queryKey: ["movies", "upcoming"],
+    queryFn: async () => (await getUpcomingMovies()).data.results as MovieListItem[],
+  });
 
-  function handleSearch() {
-    if (!inputQuery.trim()) return;
-    addToSearchHistory(inputQuery, inputType);
-    setHistory(getSearchHistory());
-    setSearchParams({ query: inputQuery, type: inputType, page: 1 });
-  }
-
-  function goToPage(page: number) {
-    setSearchParams((prev) => prev ? { ...prev, page } : null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  const hasSearched = !!searchParams;
+  const heroMovies = (popular.data ?? []).filter((m) => m.backdrop_path).slice(0, HERO_LIMIT);
 
   return (
-    <Box className="container">
-      <SearchForm
-        query={inputQuery}
-        type={inputType}
-        onQueryChange={setInputQuery}
-        onTypeChange={setInputType}
-        onSearch={handleSearch}
-      />
+    <Box>
+      <Heading as="h1" className="sr-only">
+        Movie Search
+      </Heading>
 
-      {isLoading && (
-        <Box textAlign="center" mt={6}>
-          <Spinner />
-        </Box>
+      {/* POPULARES */}
+      {popular.isLoading && <Skeleton h={{ base: "220px", md: "380px" }} borderRadius="2xl" />}
+      {popular.isError && <ErrorText />}
+      {heroMovies.length > 0 && <HeroCarousel movies={heroMovies} label="Filmes populares" />}
+
+      {/* BUSCAS RECENTES */}
+      {recentItems.length > 0 && (
+        <Section title="Buscas recentes">
+          <PosterCarousel
+            label="Buscas recentes"
+            items={recentItems.map((item) => ({
+              key: `${item.type}-${item.id}`,
+              title: item.name,
+              imageUrl: getPosterUrl(item.imagePath, "MEDIUM"),
+              onClick: () =>
+                item.type === "person"
+                  ? setSelectedActor(item.id)
+                  : navigate(`/${item.type}/${item.id}`),
+            }))}
+          />
+        </Section>
       )}
 
-      {!isLoading && isError && (
-        <Text mt={4} color="red.500">
-          Erro ao buscar dados. Tente novamente mais tarde.
-        </Text>
-      )}
-
-      {hasSearched && !isLoading && !isError && results.length === 0 && (
-        <Text mt={4} color="gray.500">
-          Nenhum resultado encontrado.
-        </Text>
-      )}
-
-      {results.length > 0 && (
-        <>
-          <SearchResults results={results} type={inputType} />
-
-          <HStack justify="center" mt={6} spacing={4}>
-            <Button
-              size="sm"
-              onClick={() => goToPage(currentPage - 1)}
-              isDisabled={currentPage <= 1}
-            >
-              Anterior
-            </Button>
-            <Text fontSize="sm" color="gray.600">
-              Página {currentPage} de {totalPages}
-            </Text>
-            <Button
-              size="sm"
-              onClick={() => goToPage(currentPage + 1)}
-              isDisabled={currentPage >= totalPages}
-            >
-              Próxima
-            </Button>
-          </HStack>
-        </>
-      )}
-
-      {!hasSearched && history.length > 0 && (
-        <Box mt={8}>
-          <Text fontWeight="600" mb={3}>
-            Buscas recentes
-          </Text>
-          <Stack spacing={2}>
-            {history.map((item, index) => (
-              <Button
-                key={index}
-                variant="ghost"
-                justifyContent="flex-start"
-                onClick={() => {
-                  setInputQuery(item.query);
-                  setInputType(item.type);
-                  setSearchParams({ query: item.query, type: item.type, page: 1 });
-                }}
-              >
-                {item.query}
-                <Text as="span" color="gray.500" ml={2}>
-                  ({item.type})
-                </Text>
-              </Button>
+      {/* EM BREVE */}
+      <Section title="Em breve nos cinemas">
+        {upcoming.isLoading && (
+          <Stack direction="row" spacing={4} overflow="hidden">
+            {Array.from({ length: 6 }, (_, i) => (
+              <Skeleton key={i} w="160px" h="240px" borderRadius="lg" flexShrink={0} />
             ))}
           </Stack>
-        </Box>
+        )}
+        {upcoming.isError && <ErrorText />}
+        {upcoming.data && (
+          <PosterCarousel
+            label="Filmes em breve nos cinemas"
+            items={upcoming.data.map((movie) => ({
+              key: String(movie.id),
+              title: movie.title,
+              subtitle: movie.original_title,
+              imageUrl: getPosterUrl(movie.poster_path, "MEDIUM"),
+              onClick: () => navigate(`/movie/${movie.id}`),
+            }))}
+          />
+        )}
+      </Section>
+
+      {selectedActor !== null && (
+        <ActorModal actorId={selectedActor} open onClose={() => setSelectedActor(null)} />
       )}
     </Box>
   );
