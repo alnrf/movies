@@ -3,9 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import {
   addToSearchHistory,
-  getLastSearch,
   getSearchHistory,
-  saveLastSearch,
   type SearchHistoryItem,
 } from "../utils/searchStorage";
 import type { SearchType } from "../types/SearchType";
@@ -39,10 +37,8 @@ async function fetchSearchResults({ query, type, page }: SearchParams) {
 }
 
 export default function HomePage() {
-  const [inputQuery, setInputQuery] = useState(() => getLastSearch()?.query ?? "");
-  const [inputType, setInputType] = useState<SearchType>(
-    () => getLastSearch()?.type ?? "movie",
-  );
+  const [inputQuery, setInputQuery] = useState("");
+  const [inputType, setInputType] = useState<SearchType>("movie");
   const [searchParams, setSearchParams] = useState<SearchParams | null>(null);
   const [history, setHistory] = useState<SearchHistoryItem[]>(() => getSearchHistory());
 
@@ -62,7 +58,6 @@ export default function HomePage() {
 
   function handleSearch() {
     if (!inputQuery.trim()) return;
-    saveLastSearch(inputQuery, inputType);
     addToSearchHistory(inputQuery, inputType);
     setHistory(getSearchHistory());
     setSearchParams({ query: inputQuery, type: inputType, page: 1 });

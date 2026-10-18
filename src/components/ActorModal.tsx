@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   getActorDetail,
@@ -28,12 +28,14 @@ import {
   Badge,
   Flex,
   IconButton,
+  Icon,
 } from "@chakra-ui/react";
 import {
   ExternalLinkIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@chakra-ui/icons";
+import { MdMovie, MdTv, MdInfoOutline, MdPhotoLibrary } from "react-icons/md";
 import { getYearFromDate, formatDate, calculateAgeDetailed } from "../utils/date";
 import { useSortByDate } from "../hooks/useSortByDate";
 import type { Person, PersonMovieCredit, PersonTvCredit, PersonImage } from "../types/Person";
@@ -50,12 +52,8 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
   const [movies, setMovies] = useState<PersonMovieCredit[]>([]);
   const [tv, setTv] = useState<PersonTvCredit[]>([]);
   const [photos, setPhotos] = useState<PersonImage[]>([]);
-  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const [photoIndex, setPhotoIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -89,22 +87,14 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
       setMovies([]);
       setTv([]);
       setPhotos([]);
-      setSelectedPhoto(null);
+      setPhotoIndex(0);
     };
   }, [actorId, open]);
 
-  const updateScrollState = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setCanScrollLeft(el.scrollLeft > 0);
-    setCanScrollRight(el.scrollLeft + el.clientWidth < el.scrollWidth - 1);
+  const showPhoto = (index: number) => {
+    // Volta ao início/fim ao passar da última/primeira foto
+    setPhotoIndex((index + photos.length) % photos.length);
   };
-
-  useEffect(() => {
-    if (photos.length > 0) {
-      setTimeout(updateScrollState, 50);
-    }
-  }, [photos]);
 
   const birthYear = getYearFromDate(actor?.birthday);
 
@@ -192,10 +182,10 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                   height="100%"
                 >
                   <TabList>
-                    <Tab>Filmes</Tab>
-                    <Tab>Seriados</Tab>
-                    <Tab>Informações</Tab>
-                    <Tab>Fotos</Tab>
+                    <Tab gap={2}><Icon as={MdMovie} />Filmes</Tab>
+                    <Tab gap={2}><Icon as={MdTv} />Seriados</Tab>
+                    <Tab gap={2}><Icon as={MdInfoOutline} />Informações</Tab>
+                    <Tab gap={2}><Icon as={MdPhotoLibrary} />Fotos</Tab>
                   </TabList>
 
                   <TabPanels flex="1" overflow="hidden">
@@ -359,82 +349,52 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                     <TabPanel
                       px={0}
                       pt={4}
-                      overflowY="auto"
-                      maxH="calc(90vh - 200px)"
+                      overflow="hidden"
                     >
                       {photos.length === 0 ? (
                         <Text color="gray.500">Nenhuma foto disponível.</Text>
                       ) : (
-                        <Stack spacing={4}>
-                          {/* CARROSSEL DE MINIATURAS */}
-                          <Flex align="center" gap={2}>
-                            {canScrollLeft && (
-                              <IconButton
-                                aria-label="Rolar para esquerda"
-                                icon={<ChevronLeftIcon boxSize={5} />}
-                                size="sm"
-                                variant="ghost"
-                                flexShrink={0}
-                                onClick={() => {
-                                  scrollRef.current?.scrollBy({ left: -240, behavior: "smooth" });
-                                  setTimeout(updateScrollState, 300);
-                                }}
-                              />
-                            )}
-                            <Box
-                              ref={scrollRef}
-                              display="flex"
-                              flexDirection="row"
-                              gap={2}
-                              overflowX="hidden"
+                        <Stack spacing={2} align="center">
+                          {/* CARROSSEL */}
+                          <Flex align="center" gap={2} w="100%">
+                            <IconButton
+                              aria-label="Foto anterior"
+                              icon={<ChevronLeftIcon boxSize={8} />}
+                              variant="ghost"
+                              size="lg"
+                              flexShrink={0}
+                              isDisabled={photos.length < 2}
+                              onClick={() => showPhoto(photoIndex - 1)}
+                            />
+                            <Flex
                               flex="1"
-                              onScroll={updateScrollState}
+                              minW={0}
+                              justify="center"
+                              h={{ base: "60vh", md: "calc(90vh - 260px)" }}
                             >
-                              {photos.map((photo) => (
-                                <Image
-                                  key={photo.file_path}
-                                  src={getProfileUrl(photo.file_path, "SMALL")}
-                                  alt="Foto do ator"
-                                  h="100px"
-                                  w="auto"
-                                  flexShrink={0}
-                                  borderRadius="md"
-                                  cursor="pointer"
-                                  opacity={selectedPhoto === photo.file_path ? 1 : 0.75}
-                                  outline={selectedPhoto === photo.file_path ? "3px solid" : "none"}
-                                  outlineColor="blue.400"
-                                  _hover={{ opacity: 1 }}
-                                  onClick={() => setSelectedPhoto(photo.file_path)}
-                                />
-                              ))}
-                            </Box>
-                            {canScrollRight && (
-                              <IconButton
-                                aria-label="Rolar para direita"
-                                icon={<ChevronRightIcon boxSize={5} />}
-                                size="sm"
-                                variant="ghost"
-                                flexShrink={0}
-                                onClick={() => {
-                                  scrollRef.current?.scrollBy({ left: 240, behavior: "smooth" });
-                                  setTimeout(updateScrollState, 300);
-                                }}
-                              />
-                            )}
-                          </Flex>
-
-                          {/* PREVIEW DA FOTO SELECIONADA */}
-                          {selectedPhoto && (
-                            <Flex justify="center">
                               <Image
-                                src={getProfileUrl(selectedPhoto, "LARGE")}
-                                alt="Foto ampliada"
-                                maxH="480px"
-                                borderRadius="md"
+                                key={photos[photoIndex].file_path}
+                                src={getProfileUrl(photos[photoIndex].file_path, "LARGE")}
+                                alt={`Foto ${photoIndex + 1} de ${actor.name}`}
+                                h="100%"
+                                maxW="100%"
                                 objectFit="contain"
+                                borderRadius="md"
                               />
                             </Flex>
-                          )}
+                            <IconButton
+                              aria-label="Próxima foto"
+                              icon={<ChevronRightIcon boxSize={8} />}
+                              variant="ghost"
+                              size="lg"
+                              flexShrink={0}
+                              isDisabled={photos.length < 2}
+                              onClick={() => showPhoto(photoIndex + 1)}
+                            />
+                          </Flex>
+                          <Text fontSize="sm" color="gray.500">
+                            {photoIndex + 1} / {photos.length}
+                          </Text>
                         </Stack>
                       )}
                     </TabPanel>
