@@ -35,6 +35,7 @@ export default function HeroCarousel({ movies, label }: Props) {
     top: "50%",
     transform: "translateY(-50%)",
     isRound: true,
+    color: "gray.800",
     boxSize: { base: 8, md: 10 },
     minW: 0,
     bg: "whiteAlpha.800",

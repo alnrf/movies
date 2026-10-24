@@ -55,4 +55,11 @@ describe('SearchForm', () => {
     fireEvent.click(screen.getByLabelText('Limpar busca'));
     expect(props.onQueryChange).toHaveBeenCalledWith('');
   });
+
+  it("limpa o campo ao trocar o tipo de busca", () => {
+    const props = renderForm({ query: "Batman" });
+    fireEvent.click(screen.getByLabelText("Séries"));
+    expect(props.onTypeChange).toHaveBeenCalledWith("tv");
+    expect(props.onQueryChange).toHaveBeenCalledWith("");
+  });
 });

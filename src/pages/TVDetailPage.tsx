@@ -75,7 +75,7 @@ export default function TVDetailPage() {
         <Heading size="lg" mb={4}>
           Série não encontrada
         </Heading>
-        <Text color="gray.500" mb={6}>
+        <Text color="text.muted" mb={6}>
           Não foi possível carregar as informações desta série.
         </Text>
         <Button colorScheme="teal" onClick={() => navigate("/")}>
@@ -108,7 +108,7 @@ export default function TVDetailPage() {
             <Heading as="h1" size="lg" mb={3}>
               {tv.name}
             </Heading>
-            <Text fontSize="md" color="gray.700">
+            <Text fontSize="md" color="text.secondary">
               {tv.overview}
             </Text>
           </Box>

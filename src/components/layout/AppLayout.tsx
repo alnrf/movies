@@ -9,10 +9,12 @@ import {
   DrawerOverlay,
   Flex,
   IconButton,
+  Image,
   Spinner,
-  Text,
   useDisclosure,
 } from "@chakra-ui/react";
+import logoMini from "../../assets/MovieTVSearchMini.png";
+import { getSidebarCollapsed, saveSidebarCollapsed } from "../../utils/preferences";
 import { ChevronLeftIcon, ChevronRightIcon, HamburgerIcon } from "@chakra-ui/icons";
 import Sidebar from "./Sidebar";
 import SearchForm from "../SearchForm";
@@ -49,6 +51,13 @@ export default function AppLayout() {
   const location = useLocation();
   const [params] = useSearchParams();
   const menu = useDisclosure();
+  const [collapsed, setCollapsed] = useState(getSidebarCollapsed);
+
+  function toggleCollapsed() {
+    const next = !collapsed;
+    setCollapsed(next);
+    saveSidebarCollapsed(next);
+  }
 
   const [form, setForm] = useState<FormState>(
     () => formStateFromLocation(location.pathname, params) ?? { query: "", type: "movie" },
@@ -78,21 +87,22 @@ export default function AppLayout() {
   }
 
   return (
-    <Flex minH="100vh" bg="gray.50">
+    <Flex minH="100vh" bg="bg.canvas">
       {/* SIDEBAR FIXA (desktop) */}
       <Box
         as="aside"
         display={{ base: "none", lg: "block" }}
-        w="240px"
+        w={collapsed ? "76px" : "240px"}
+        transition="width 0.2s ease"
         flexShrink={0}
         position="sticky"
         top={0}
         h="100vh"
-        bg="white"
+        bg="bg.surface"
         borderRightWidth="1px"
-        borderColor="gray.100"
+        borderColor="border.subtle"
       >
-        <Sidebar />
+        <Sidebar collapsed={collapsed} onToggleCollapse={toggleCollapsed} />
       </Box>
 
       {/* SIDEBAR DESLIZANTE (celular/tablet) */}
@@ -140,12 +150,13 @@ export default function AppLayout() {
               isRound
               onClick={() => navigate(1)}
             />
-            <Text display={{ base: "block", lg: "none" }} fontWeight="bold" ml={2}>
-              Movie Search
-              <Text as="span" color="red.500">
-                .
-              </Text>
-            </Text>
+            <Image
+              src={logoMini}
+              alt="Movie & TV Search"
+              display={{ base: "block", lg: "none" }}
+              boxSize="32px"
+              ml={2}
+            />
           </Flex>
 
           <Box flex="1" minW={{ base: "100%", md: "420px" }}>

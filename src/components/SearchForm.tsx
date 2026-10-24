@@ -45,14 +45,14 @@ export default function SearchForm({
         {/* INPUT */}
         <InputGroup flex="1" minW={0}>
           <InputLeftElement pointerEvents="none">
-            <SearchIcon color="gray.400" />
+            <SearchIcon color="text.subtle" />
           </InputLeftElement>
 
           <Input
             value={query}
             onChange={(e) => onQueryChange(e.target.value)}
             placeholder="Pesquisar..."
-            bg="white"
+            bg="bg.surface"
             borderRadius="full"
             pr={query ? "2.5rem" : undefined}
           />
@@ -73,7 +73,11 @@ export default function SearchForm({
         {/* RADIOS */}
         <RadioGroup
           value={type}
-          onChange={(value) => onTypeChange(value as SearchType)}
+          onChange={(value) => {
+            // Trocar o tipo começa uma busca nova: limpa o campo.
+            onTypeChange(value as SearchType);
+            onQueryChange("");
+          }}
           colorScheme="red"
         >
           <Stack direction="row" spacing={4}>
@@ -86,7 +90,16 @@ export default function SearchForm({
         </RadioGroup>
 
         {/* BUTTON */}
-        <Button type="submit" colorScheme="red" borderRadius="full" px={8} flexShrink={0}>
+        <Button
+          type="submit"
+          bg="red.500"
+          color="white"
+          _hover={{ bg: "red.600" }}
+          _active={{ bg: "red.700" }}
+          borderRadius="full"
+          px={8}
+          flexShrink={0}
+        >
           Buscar
         </Button>
       </Flex>

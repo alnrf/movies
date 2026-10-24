@@ -58,7 +58,7 @@ export default function WatchProviders({ mediaType, id }: Props) {
       {isLoading && <Spinner size="sm" />}
 
       {!isLoading && !hasAny && (
-        <Text fontSize="sm" color="gray.500">
+        <Text fontSize="sm" color="text.muted">
           Nenhuma informação de streaming disponível.
         </Text>
       )}

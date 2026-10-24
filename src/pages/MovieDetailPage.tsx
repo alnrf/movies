@@ -65,7 +65,7 @@ export default function MovieDetailPage() {
         <Heading size="lg" mb={4}>
           Filme não encontrado
         </Heading>
-        <Text color="gray.500" mb={6}>
+        <Text color="text.muted" mb={6}>
           Não foi possível carregar as informações deste filme.
         </Text>
         <Button colorScheme="teal" onClick={() => navigate("/")}>
@@ -96,7 +96,7 @@ export default function MovieDetailPage() {
           <Heading as="h1" size="lg" mb={3}>
             {movie.title}
           </Heading>
-          <Text fontSize="md" color="gray.700">
+          <Text fontSize="md" color="text.secondary">
             {movie.overview}
           </Text>
         </Box>

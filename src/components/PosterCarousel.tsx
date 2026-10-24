@@ -48,7 +48,7 @@ export default function PosterCarousel({ items, label }: Props) {
     isRound: true,
     visibility: hasOverflow ? ("visible" as const) : ("hidden" as const),
     variant: "outline",
-    bg: "white",
+    bg: "bg.surface",
     flexShrink: 0,
     display: { base: "none", md: "inline-flex" },
   };
@@ -104,7 +104,7 @@ export default function PosterCarousel({ items, label }: Props) {
                 {item.title}
               </Text>
               {item.subtitle && (
-                <Text fontSize="xs" color="gray.500" noOfLines={1}>
+                <Text fontSize="xs" color="text.muted" noOfLines={1}>
                   {item.subtitle}
                 </Text>
               )}

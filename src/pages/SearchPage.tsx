@@ -85,7 +85,7 @@ export default function SearchPage() {
       )}
 
       {!isLoading && !isError && results.length === 0 && (
-        <Text mt={4} color="gray.500">
+        <Text mt={4} color="text.muted">
           Nenhum resultado encontrado.
         </Text>
       )}
@@ -98,7 +98,7 @@ export default function SearchPage() {
             <Button size="sm" onClick={() => goToPage(page - 1)} isDisabled={page <= 1}>
               Anterior
             </Button>
-            <Text fontSize="sm" color="gray.600">
+            <Text fontSize="sm" color="text.secondary">
               Página {page} de {totalPages}
             </Text>
             <Button

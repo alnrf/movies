@@ -28,7 +28,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           <Heading size="xl" mb={4}>
             Algo deu errado
           </Heading>
-          <Text color="gray.600" mb={6}>
+          <Text color="text.secondary" mb={6}>
             {this.state.error?.message ?? "Erro inesperado. Tente novamente."}
           </Text>
           <Button

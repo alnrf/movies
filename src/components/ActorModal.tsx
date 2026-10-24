@@ -197,7 +197,7 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                       maxH={{ base: "auto", md: "calc(90vh - 220px)" }}
                     >
                       {sortedMovies.length === 0 ? (
-                        <Text color="gray.500">Nenhum filme encontrado.</Text>
+                        <Text color="text.muted">Nenhum filme encontrado.</Text>
                       ) : (
                         <Stack spacing={3}>
                           {sortedMovies.map((m) => {
@@ -221,16 +221,16 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                                   />
                                 </Stack>
                                 {m.original_title !== m.title && (
-                                  <Text fontSize="sm" color="gray.600">
+                                  <Text fontSize="sm" color="text.secondary">
                                     {m.original_title}
                                   </Text>
                                 )}
-                                <Text fontSize="sm" color="gray.600">
+                                <Text fontSize="sm" color="text.secondary">
                                   {m.character}
                                 </Text>
                                 <Flex direction="row" align="center" gap={2}>
-                                  <Text fontSize="sm" color="gray.600">Idade:</Text>
-                                  <Text fontSize="sm" color="gray.600">
+                                  <Text fontSize="sm" color="text.secondary">Idade:</Text>
+                                  <Text fontSize="sm" color="text.secondary">
                                     {year && birthYear && typeof year === "number" && typeof birthYear === "number"
                                       ? year - birthYear
                                       : "—"}{" "}
@@ -253,7 +253,7 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                       maxH="calc(90vh - 200px)"
                     >
                       {sortedTv.length === 0 ? (
-                        <Text color="gray.500">Nenhum programa de TV encontrado.</Text>
+                        <Text color="text.muted">Nenhum programa de TV encontrado.</Text>
                       ) : (
                         <Stack spacing={3}>
                           {sortedTv.map((t) => {
@@ -277,22 +277,22 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                                   />
                                 </Stack>
                                 {t.name !== t.original_name && (
-                                  <Text fontSize="sm" color="gray.600">
+                                  <Text fontSize="sm" color="text.secondary">
                                     {t.original_name}
                                   </Text>
                                 )}
                                 <Stack direction="row" align="center" spacing={2}>
-                                  <Text fontSize="sm" color="gray.600">
+                                  <Text fontSize="sm" color="text.secondary">
                                     {t.character}
                                   </Text>
                                   {t.episode_count && (
-                                    <Text fontSize="sm" color="gray.600">
+                                    <Text fontSize="sm" color="text.secondary">
                                       - Episódios: {t.episode_count}
                                     </Text>
                                   )}
                                 </Stack>
                                 <Flex direction="row" align="center" gap={2}>
-                                  <Text fontSize="sm" color="gray.600">
+                                  <Text fontSize="sm" color="text.secondary">
                                     Idade:{" "}
                                     {birthYear && typeof year === "number"
                                       ? year - birthYear
@@ -340,7 +340,7 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                             <Text whiteSpace="pre-line">{actor.biography}</Text>
                           </Box>
                         ) : (
-                          <Text color="gray.500">Biografia não disponível.</Text>
+                          <Text color="text.muted">Biografia não disponível.</Text>
                         )}
                       </Stack>
                     </TabPanel>
@@ -352,7 +352,7 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                       overflow="hidden"
                     >
                       {photos.length === 0 ? (
-                        <Text color="gray.500">Nenhuma foto disponível.</Text>
+                        <Text color="text.muted">Nenhuma foto disponível.</Text>
                       ) : (
                         <Stack spacing={2} align="center">
                           {/* CARROSSEL */}
@@ -392,7 +392,7 @@ export default function ActorModal({ actorId, open, onClose }: Props) {
                               onClick={() => showPhoto(photoIndex + 1)}
                             />
                           </Flex>
-                          <Text fontSize="sm" color="gray.500">
+                          <Text fontSize="sm" color="text.muted">
                             {photoIndex + 1} / {photos.length}
                           </Text>
                         </Stack>
