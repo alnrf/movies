@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Box, Flex, Heading, Image, Link, Spinner, Stack, Text, Wrap, WrapItem } from "@chakra-ui/react";
 import { getMovieWatchProviders, getTvWatchProviders } from "../api/tmdbService";
 import { getProviderLogoUrl } from "../utils/tmdbImage";
-import { getBrowserRegion } from "../utils/getBrowserLanguage";
+import { TMDB_REGION } from "../config/tmdb";
 import type { WatchProvider, WatchProvidersResponse } from "../types/WatchProviders";
 
 interface Props {
@@ -35,7 +35,7 @@ function ProviderList({ providers }: { providers: WatchProvider[] }) {
 }
 
 export default function WatchProviders({ mediaType, id }: Props) {
-  const region = getBrowserRegion();
+  const region = TMDB_REGION;
 
   const { data, isLoading } = useQuery({
     queryKey: ["watchProviders", mediaType, id],

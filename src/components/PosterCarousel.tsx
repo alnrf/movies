@@ -1,10 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AspectRatio, Box, Flex, IconButton, Image, Text } from "@chakra-ui/react";
+import { AspectRatio, Box, Flex, IconButton, Image, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 
 export interface PosterCarouselItem {
   key: string;
-  title: string;
+  /** Texto abaixo da imagem; sem ele, só a imagem aparece. */
+  title?: string;
+  /** Nome acessível do card (padrão: o título). */
+  ariaLabel?: string;
   subtitle?: string;
   imageUrl: string;
   onClick: () => void;
@@ -13,10 +16,32 @@ export interface PosterCarouselItem {
 interface Props {
   items: PosterCarouselItem[];
   label: string;
+  /** Proporção da imagem (padrão: pôster 2:3). */
+  ratio?: number;
+  /** Largura de cada card. */
+  itemWidth?: { base: string; md: string };
+}
+
+const POSTER_WIDTH = { base: "130px", md: "160px" };
+
+/** Placeholder da faixa de pôsteres enquanto os dados carregam. */
+export function PosterCarouselSkeleton({ count = 6 }: { count?: number }) {
+  return (
+    <Stack direction="row" spacing={4} overflow="hidden" aria-busy="true">
+      {Array.from({ length: count }, (_, i) => (
+        <Skeleton key={i} w={POSTER_WIDTH} h={{ base: "195px", md: "240px" }} borderRadius="lg" flexShrink={0} />
+      ))}
+    </Stack>
+  );
 }
 
 /** Faixa horizontal de cards com pôster, rolável por setas ou toque. */
-export default function PosterCarousel({ items, label }: Props) {
+export default function PosterCarousel({
+  items,
+  label,
+  ratio = 2 / 3,
+  itemWidth = POSTER_WIDTH,
+}: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -78,11 +103,12 @@ export default function PosterCarousel({ items, label }: Props) {
         sx={{ scrollbarWidth: "none", "&::-webkit-scrollbar": { display: "none" } }}
       >
         {items.map((item) => (
-          <Box as="li" key={item.key} flexShrink={0} w={{ base: "130px", md: "160px" }} scrollSnapAlign="start">
+          <Box as="li" key={item.key} flexShrink={0} w={itemWidth} scrollSnapAlign="start">
             <Box
               as="button"
               type="button"
               onClick={item.onClick}
+              aria-label={item.ariaLabel}
               w="100%"
               textAlign="left"
               borderRadius="lg"
@@ -90,7 +116,7 @@ export default function PosterCarousel({ items, label }: Props) {
               _hover={{ transform: "translateY(-4px)" }}
               _focusVisible={{ outline: "2px solid", outlineColor: "red.400", outlineOffset: "2px" }}
             >
-              <AspectRatio ratio={2 / 3} mb={2}>
+              <AspectRatio ratio={ratio} mb={item.title ? 2 : 0}>
                 <Image
                   src={item.imageUrl}
                   alt=""
@@ -100,9 +126,11 @@ export default function PosterCarousel({ items, label }: Props) {
                   loading="lazy"
                 />
               </AspectRatio>
-              <Text fontWeight="semibold" fontSize="sm" noOfLines={2}>
-                {item.title}
-              </Text>
+              {item.title && (
+                <Text fontWeight="semibold" fontSize="sm" noOfLines={2}>
+                  {item.title}
+                </Text>
+              )}
               {item.subtitle && (
                 <Text fontSize="xs" color="text.muted" noOfLines={1}>
                   {item.subtitle}

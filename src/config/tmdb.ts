@@ -4,6 +4,11 @@ if (!BEARER_TOKEN) {
   throw new Error("VITE_TMDB_BEARER_TOKEN não definido no .env");
 }
 
+/** Idioma fixo das respostas da API. */
+export const TMDB_LANGUAGE = "pt-BR";
+/** Região usada nos serviços de streaming (onde assistir). */
+export const TMDB_REGION = "BR";
+
 export const TMDB_CONFIG = {
   BASE_URL: "https://api.themoviedb.org/3",
   IMAGE_URL: "https://image.tmdb.org/t/p",

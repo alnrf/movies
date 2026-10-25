@@ -1,8 +1,8 @@
 import { tmdbClient } from "./tmdbClient";
-import { getBrowserLanguage } from "../utils/getBrowserLanguage";
+import { TMDB_LANGUAGE } from "../config/tmdb";
 
 const defaultParams = {
-  language: getBrowserLanguage(),
+  language: TMDB_LANGUAGE,
   include_adult: false,
 };
 /* SEARCH */
@@ -65,10 +65,24 @@ export const getActorTv = (actorId: number) =>
 export const getActorImages = (actorId: number) =>
   tmdbClient.get(`/person/${actorId}/images`);
 
-  export const getCredits = (
-  mediaType: "movie" | "tv",
-  id: number
-) => tmdbClient.get(`/${mediaType}/${id}/${mediaType === "movie" ? "credits" : "aggregate_credits"}`);
+export const getCredits = (mediaType: "movie" | "tv", id: number) =>
+  tmdbClient.get(
+    `/${mediaType}/${id}/${mediaType === "movie" ? "credits" : "aggregate_credits"}`,
+    { params: { language: defaultParams.language } },
+  );
+
+/* SIMILAR */
+export const getSimilar = (mediaType: "movie" | "tv", id: number, page = 1) =>
+  tmdbClient.get(`/${mediaType}/${id}/similar`, {
+    params: { language: defaultParams.language, page },
+  });
+
+/* IMAGES */
+// Imagens em português e as sem idioma (cenas sem texto), que são a maioria.
+export const getMediaImages = (mediaType: "movie" | "tv", id: number) =>
+  tmdbClient.get(`/${mediaType}/${id}/images`, {
+    params: { language: defaultParams.language, include_image_language: "pt,null" },
+  });
 
 /* WATCH PROVIDERS */
 export const getMovieWatchProviders = (movieId: number) =>

@@ -3,6 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getTvShowDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
+import DetailSection from "../components/DetailSection";
+import MediaGallery from "../components/MediaGallery";
+import SimilarTitles from "../components/SimilarTitles";
 import { getBackdropUrl } from "../utils/tmdbImage";
 import { formatDate } from "../utils/date";
 import WatchProviders from "../components/WatchProviders";
@@ -173,22 +176,28 @@ export default function TVDetailPage() {
 
         <Divider mt={3} />
 
-        <Heading as="h3" size="md" mb={3} mt={6}>
-          Elenco do Programa
-        </Heading>
-        <Grid
-          templateColumns={{
-            base: "1fr",
-            md: "repeat(2, 1fr)",
-            lg: "repeat(5, 1fr)",
-          }}
-          gap={6}
-          mt={4}
-        >
-          {cast.map((actor) => (
-            <CastCard key={actor.id} actor={actor} />
-          ))}
-        </Grid>
+        <DetailSection title="Fotos do Programa">
+          <MediaGallery mediaType="tv" id={tv.id} title={tv.name} />
+        </DetailSection>
+
+        <DetailSection title="Elenco do Programa">
+          <Grid
+            templateColumns={{
+              base: "1fr",
+              md: "repeat(2, 1fr)",
+              lg: "repeat(5, 1fr)",
+            }}
+            gap={6}
+          >
+            {cast.map((actor) => (
+              <CastCard key={actor.id} actor={actor} />
+            ))}
+          </Grid>
+        </DetailSection>
+
+        <DetailSection title="Séries Semelhantes">
+          <SimilarTitles mediaType="tv" id={tv.id} title={tv.name} />
+        </DetailSection>
       </Box>
 
       <SeasonsModal

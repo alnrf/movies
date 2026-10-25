@@ -1,12 +1,12 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Box, Heading, Skeleton, Stack, Text } from "@chakra-ui/react";
+import { Box, Heading, Skeleton, Text } from "@chakra-ui/react";
 import { getPopular, getUpcomingMovies } from "../api/tmdbService";
 import { getRecentItems, type RecentItem } from "../utils/searchStorage";
 import { getPosterUrl } from "../utils/tmdbImage";
 import HeroCarousel from "../components/HeroCarousel";
-import PosterCarousel from "../components/PosterCarousel";
+import PosterCarousel, { PosterCarouselSkeleton } from "../components/PosterCarousel";
 import ActorModal from "../components/ActorModal";
 import type { MovieListItem } from "../types/Movie";
 
@@ -79,13 +79,7 @@ export default function HomePage() {
 
       {/* EM BREVE */}
       <Section title="Em breve nos cinemas">
-        {upcoming.isLoading && (
-          <Stack direction="row" spacing={4} overflow="hidden">
-            {Array.from({ length: 6 }, (_, i) => (
-              <Skeleton key={i} w="160px" h="240px" borderRadius="lg" flexShrink={0} />
-            ))}
-          </Stack>
-        )}
+        {upcoming.isLoading && <PosterCarouselSkeleton />}
         {upcoming.isError && <ErrorText />}
         {upcoming.data && (
           <PosterCarousel

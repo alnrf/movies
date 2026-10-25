@@ -3,6 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getMovieDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
+import DetailSection from "../components/DetailSection";
+import MediaGallery from "../components/MediaGallery";
+import SimilarTitles from "../components/SimilarTitles";
 import { formatDate } from "../utils/date";
 import { getBackdropUrl } from "../utils/tmdbImage";
 import { formatMoney } from "../utils/currency";
@@ -143,22 +146,28 @@ export default function MovieDetailPage() {
         </Box>
       </Stack>
 
-      <Heading as="h3" size="md" mb={3} mt={6}>
-        Elenco do Filme
-      </Heading>
-      <Grid
-        templateColumns={{
-          base: "1fr",
-          md: "repeat(2, 1fr)",
-          lg: "repeat(5, 1fr)",
-        }}
-        gap={6}
-        mt={4}
-      >
-        {cast.map((actor) => (
-          <CastCard key={actor.id} actor={actor} />
-        ))}
-      </Grid>
+      <DetailSection title="Fotos do Filme">
+        <MediaGallery mediaType="movie" id={movie.id} title={movie.title} />
+      </DetailSection>
+
+      <DetailSection title="Elenco do Filme">
+        <Grid
+          templateColumns={{
+            base: "1fr",
+            md: "repeat(2, 1fr)",
+            lg: "repeat(5, 1fr)",
+          }}
+          gap={6}
+        >
+          {cast.map((actor) => (
+            <CastCard key={actor.id} actor={actor} />
+          ))}
+        </Grid>
+      </DetailSection>
+
+      <DetailSection title="Filmes Semelhantes">
+        <SimilarTitles mediaType="movie" id={movie.id} title={movie.title} />
+      </DetailSection>
     </Box>
   );
 }
