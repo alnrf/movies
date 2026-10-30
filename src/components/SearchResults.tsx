@@ -50,8 +50,17 @@ export default function SearchResults({ results, type, recordRecent = false }: P
           >
             <Image
               src={getPosterUrl(posterPath, "XSMALL")}
+              srcSet={
+                posterPath
+                  ? `${getPosterUrl(posterPath, "XSMALL")} 92w, ${getPosterUrl(posterPath, "SMALL")} 200w, ${getPosterUrl(posterPath, "MEDIUM")} 300w, ${getPosterUrl(posterPath, "LARGE")} 500w`
+                  : undefined
+              }
+              sizes="(min-width: 30em) 92px, 50vw"
               alt={title}
               objectFit="cover"
+              w={{ base: "50%", sm: "92px" }}
+              alignSelf={{ base: "center", sm: "auto" }}
+              mt={{ base: "4", sm: "0" }}
             />
             <Stack>
               <CardBody>
@@ -61,6 +70,7 @@ export default function SearchResults({ results, type, recordRecent = false }: P
                 <Button
                   variant="solid"
                   colorScheme="blue"
+                  w={{ base: "full", sm: "auto" }}
                   onClick={() => {
                     if (recordRecent) {
                       addRecentItem({ id: item.id, type, name: displayName, imagePath: posterPath });
