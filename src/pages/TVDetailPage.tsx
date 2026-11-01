@@ -5,7 +5,6 @@ import { getTvShowDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
 import DetailSection from "../components/DetailSection";
 import MediaGallery from "../components/MediaGallery";
-import SimilarTitles from "../components/SimilarTitles";
 import { getBackdropUrl } from "../utils/tmdbImage";
 import { formatDate } from "../utils/date";
 import WatchProviders from "../components/WatchProviders";
@@ -193,10 +192,6 @@ export default function TVDetailPage() {
               <CastCard key={actor.id} actor={actor} />
             ))}
           </Grid>
-        </DetailSection>
-
-        <DetailSection title="Séries Semelhantes">
-          <SimilarTitles mediaType="tv" id={tv.id} title={tv.name} />
         </DetailSection>
       </Box>
 

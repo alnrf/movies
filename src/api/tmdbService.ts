@@ -71,12 +71,6 @@ export const getCredits = (mediaType: "movie" | "tv", id: number) =>
     { params: { language: defaultParams.language } },
   );
 
-/* SIMILAR */
-export const getSimilar = (mediaType: "movie" | "tv", id: number, page = 1) =>
-  tmdbClient.get(`/${mediaType}/${id}/similar`, {
-    params: { language: defaultParams.language, page },
-  });
-
 /* IMAGES */
 // Imagens em português e as sem idioma (cenas sem texto), que são a maioria.
 export const getMediaImages = (mediaType: "movie" | "tv", id: number) =>

@@ -5,7 +5,6 @@ import { getMovieDetail, getCredits } from "../api/tmdbService";
 import CastCard from "../components/CastCard";
 import DetailSection from "../components/DetailSection";
 import MediaGallery from "../components/MediaGallery";
-import SimilarTitles from "../components/SimilarTitles";
 import { formatDate } from "../utils/date";
 import { getBackdropUrl } from "../utils/tmdbImage";
 import { formatMoney } from "../utils/currency";
@@ -163,10 +162,6 @@ export default function MovieDetailPage() {
             <CastCard key={actor.id} actor={actor} />
           ))}
         </Grid>
-      </DetailSection>
-
-      <DetailSection title="Filmes Semelhantes">
-        <SimilarTitles mediaType="movie" id={movie.id} title={movie.title} />
       </DetailSection>
     </Box>
   );
